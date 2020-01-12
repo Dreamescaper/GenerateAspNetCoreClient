@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TestApp": {
+      "commandName": "Project",
+      "commandLineArgs": "\"..\\..\\..\\..\\ApiExplorerTest\\bin\\Debug\\netcoreapp3.1\\ApiExplorerWebApiTest.dll\" -o \"..\\..\\..\\..\\OutputTest\" -n \"TestClient\""
+    }
+  }
+}
