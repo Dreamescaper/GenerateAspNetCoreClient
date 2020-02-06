@@ -5,15 +5,16 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
+using GenerateClientCommand.Extensions;
 using GenerateClientCommand.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Hosting;
 using Namotion.Reflection;
 using Options;
-using TestApp;
 
 namespace GenerateClientCommand
 {
@@ -112,7 +113,7 @@ namespace GenerateClientCommand
 
                 return
 $@"{xmlDoc}{multipartAttribute}{methodPathAttribute}
-{endpointMethod.ResponseType.ToTask().GetName(ambiguousTypes)} {endpointMethod.Name}({string.Join(", ", parameterStrings)});";
+{endpointMethod.ResponseType.WrapInTask().GetName(ambiguousTypes)} {endpointMethod.Name}({string.Join(", ", parameterStrings)});";
             }).ToArray();
 
             return
@@ -367,7 +368,8 @@ namespace {clientModel.Namespace}
 
                 foreach (var parameterDescription in apiDescription.ParameterDescriptions)
                 {
-                    // Skip FormFile, as it won't be present in result file
+                    // Skip FormFile, as it won't be present in result file 
+                    // (not needed for 3.1+)
                     if (parameterDescription.Source.Id != "FormFile")
                     {
                         AddForType(parameterDescription.Type);
@@ -395,33 +397,27 @@ namespace {clientModel.Namespace}
 
         private static string? GetDefaultValueLiteral(ApiParameterDescription parameter)
         {
-            string? defaultValue()
+            // Use reflection for AspNetCore 2.1 compatibility.
+            var defaultValue = parameter.TryGetPropertyValue<object>(nameof(parameter.DefaultValue));
+
+            if (defaultValue != null)
             {
-                return parameter.IsRequired ? null : ToLiteral(parameter.DefaultValue);
+                // If defaultValue is not null - return it.
+                return defaultValue.ToLiteral();
+            }
+            else if (parameter.TryGetPropertyValue(nameof(parameter.IsRequired), true) == false)
+            {
+                // If defaultValue is null, but value is not required - return it anyway.
+                return defaultValue.ToLiteral();
             }
 
-            if (typeof(ApiParameterDescription).GetProperty("IsRequired") != null)
+            // If query parameter - use default null.
+            if (parameter.Source == BindingSource.Query)
             {
-                return defaultValue();
+                return "null";
             }
 
             return null;
-        }
-
-        private static string ToLiteral(object obj)
-        {
-            var type = obj.GetType();
-
-            return obj switch
-            {
-                null => "null",
-                string s => '"' + s + '"',
-                char c => "'" + c + "'",
-                bool b => b ? "true" : "false",
-                _ when type.IsEnum && Enum.IsDefined(type, obj) => $"{type.Name}.{obj}",
-                _ when type.IsPrimitive => obj.ToString() ?? "",
-                _ => throw new NotSupportedException()
-            };
         }
     }
 }

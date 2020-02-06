@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace GenerateClientCommand
+namespace GenerateClientCommand.Extensions
 {
-    public static class StringExtensions
+    internal static class StringExtensions
     {
         private static readonly Regex NonAlphaNumericRegex = new Regex(@"[^a-zA-Z0-9]+");
 
@@ -33,13 +33,14 @@ namespace GenerateClientCommand
                 if (part.Length == 0)
                     return part;
 
-                // If part is all uppercase - convert to lowercase all apart from first letter.
                 if (part.ToUpperInvariant() == part)
                 {
+                    // If part is all uppercase - convert to lowercase all apart from first letter.
                     return part[0] + part.Substring(1).ToLowerInvariant();
                 }
-                // Otherwise - convert first letter to uppercase, everything else - as is.
+                else
                 {
+                    // Otherwise - convert first letter to uppercase, everything else - as is.
                     return char.ToUpperInvariant(part[0]) + part.Substring(1);
                 }
             }
@@ -48,7 +49,7 @@ namespace GenerateClientCommand
         public static string Indent(this string @this, string indent)
         {
             var lines = @this.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            var indentedLines = lines.Select(line => line.Length == 0 ? line : (indent + line));
+            var indentedLines = lines.Select(line => line.Length == 0 ? line : indent + line);
             return string.Join(Environment.NewLine, indentedLines);
         }
 

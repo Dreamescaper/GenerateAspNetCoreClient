@@ -67,5 +67,11 @@ namespace ApiExplorerTest.Controllers
         {
             return null;
         }
+
+        [HttpPost("{id}/queryParams")]
+        public Task<WeatherForecast> SomethingWithQueryParams(int id = 1, string par1 = null, string par2 = "1")
+        {
+            return null;
+        }
     }
 }

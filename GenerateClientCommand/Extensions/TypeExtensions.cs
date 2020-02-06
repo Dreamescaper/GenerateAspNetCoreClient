@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TestApp
+namespace GenerateClientCommand.Extensions
 {
-    public static class TypeExtensions
+    internal static class TypeExtensions
     {
         private static readonly Dictionary<Type, string> DefaultTypes = new Dictionary<Type, string>
         {
@@ -83,7 +83,7 @@ namespace TestApp
             return name;
         }
 
-        public static Type ToTask(this Type @this)
+        public static Type WrapInTask(this Type @this)
         {
             if (@this == typeof(void))
                 return typeof(Task);
