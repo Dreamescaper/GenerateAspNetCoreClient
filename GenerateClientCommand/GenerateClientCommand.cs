@@ -347,11 +347,20 @@ namespace {clientModel.Namespace}
                     _ => ParameterSource.Query
                 };
 
+                var defaultValue = GetDefaultValueLiteral(parameterDescription);
+
+                var type = parameterDescription.Type ?? typeof(string);
+
+                if (defaultValue != null)
+                {
+                    type = type.ToNullable();
+                }
+
                 parametersList.Add(new Parameter(
                     source: source,
-                    type: parameterDescription.Type ?? typeof(string),
+                    type: type,
                     name: parameterDescription.Name.ToCamelCase(),
-                    defaultValueLiteral: GetDefaultValueLiteral(parameterDescription)));
+                    defaultValueLiteral: defaultValue));
             }
 
             return parametersList;

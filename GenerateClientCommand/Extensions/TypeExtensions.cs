@@ -90,5 +90,16 @@ namespace GenerateClientCommand.Extensions
 
             return typeof(Task<>).MakeGenericType(@this);
         }
+
+        public static Type ToNullable(this Type @this)
+        {
+            if (!@this.IsValueType)
+                return @this;
+
+            if (@this.IsGenericType && @this.GetGenericTypeDefinition() == typeof(Nullable<>))
+                return @this;
+
+            return typeof(Nullable<>).MakeGenericType(@this);
+        }
     }
 }
