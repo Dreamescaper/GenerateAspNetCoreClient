@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Loader;
 using CommandLine;
+using DotNet.Cli.Build;
 using Options;
 
 namespace TestApp
@@ -18,31 +19,32 @@ namespace TestApp
 
         private static void CreateClient(GenerateClientOptions options)
         {
-            var assemblyPath = Path.GetFullPath(options.InputPath);
+            var assemblyPath = GetAssemblyPath(options.InputPath);
             var directory = Path.GetDirectoryName(assemblyPath);
 
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "local");
+            var sharedOptionsAssembly = typeof(GenerateClientOptions).Assembly;
+            var context = new CustomLoadContext(assemblyPath, sharedOptionsAssembly);
+            AssemblyLoadContext.Default.Resolving += (_, name) => context.LoadInternal(name);
 
-            var previousBaseDirectory = AppContext.GetData("APP_CONTEXT_BASE_DIRECTORY");
-            typeof(AppContext).GetMethod("SetData").Invoke(null, new[] { "APP_CONTEXT_BASE_DIRECTORY", directory });
+            var webProjectAssembly = context.LoadFromAssemblyPath(assemblyPath);
+            var commandAssembly = context.LoadFromAssemblyPath(typeof(GenerateClientCommand.GenerateClientCommand).Assembly.Location);
 
-            try
+            commandAssembly.GetTypes().First(t => t.Name == "GenerateClientCommand")
+                .GetMethod("Invoke")
+                .Invoke(null, new object[] { webProjectAssembly, options });
+        }
+
+        private static string GetAssemblyPath(string path)
+        {
+            if (Path.GetExtension(path).Equals(".dll", StringComparison.OrdinalIgnoreCase))
             {
-                var sharedOptionsAssembly = typeof(GenerateClientOptions).Assembly;
-                var context = new CustomLoadContext(assemblyPath, sharedOptionsAssembly);
-                AssemblyLoadContext.Default.Resolving += (_, name) => context.LoadInternal(name);
-
-                var webProjectAssembly = context.LoadFromAssemblyPath(assemblyPath);
-                var commandAssembly = context.LoadFromAssemblyPath(typeof(GenerateClientCommand.GenerateClientCommand).Assembly.Location);
-
-                commandAssembly.GetTypes().First(t => t.Name == "GenerateClientCommand")
-                    .GetMethod("Invoke")
-                    .Invoke(null, new object[] { webProjectAssembly, options });
+                // If path is .dll file - return straight away 
+                return Path.GetFullPath(path);
             }
-            finally
-            {
-                typeof(AppContext).GetMethod("SetData").Invoke(null, new[] { "APP_CONTEXT_BASE_DIRECTORY", previousBaseDirectory });
-            }
+
+            var project = Project.FromPath(path);
+            project.Build();
+            return project.OutputFilePath;
         }
     }
 }

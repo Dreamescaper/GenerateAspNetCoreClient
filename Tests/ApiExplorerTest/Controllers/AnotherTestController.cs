@@ -10,6 +10,7 @@ namespace ApiExplorerWebApiTest.Controllers
         [HttpGet("with-query-model")]
         public async Task<ActionResult> WithQueryModel([FromQuery]SomeQueryModel queryModel)
         {
+            await Task.Delay(1);
             return Ok();
         }
     }

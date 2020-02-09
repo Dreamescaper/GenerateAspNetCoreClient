@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiExplorerWebApiTest", "Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OutputTest", "Tests\OutputTest\OutputTest.csproj", "{43DDF7F9-8F47-49EC-B919-923E06D86AB7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.Cli.Build", "DotNet.Cli.Build\DotNet.Cli.Build.csproj", "{C3DB14C0-A82D-4CF4-A91D-79941D94DB01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{43DDF7F9-8F47-49EC-B919-923E06D86AB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43DDF7F9-8F47-49EC-B919-923E06D86AB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43DDF7F9-8F47-49EC-B919-923E06D86AB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3DB14C0-A82D-4CF4-A91D-79941D94DB01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3DB14C0-A82D-4CF4-A91D-79941D94DB01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3DB14C0-A82D-4CF4-A91D-79941D94DB01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3DB14C0-A82D-4CF4-A91D-79941D94DB01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

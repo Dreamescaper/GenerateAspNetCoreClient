@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="__GetProjectMetadata" Condition="">
+    <MSBuild Condition=" '$(TargetFramework)' == '' "
+             Projects="$(MSBuildProjectFile)"
+             Targets="__GetProjectMetadata"
+             Properties="TargetFramework=$(TargetFrameworks.Split(';')[0]);DotNetCliBuildMetadataFile=$(DotNetCliBuildMetadataFile)" />
+    <ItemGroup Condition=" '$(TargetFramework)' != '' ">
+      <DotNetCliBuildProjectMetadata Include="AssemblyName: $(AssemblyName)" />
+      <DotNetCliBuildProjectMetadata Include="Language: $(Language)" />
+      <DotNetCliBuildProjectMetadata Include="OutputPath: $(OutputPath)" />
+      <DotNetCliBuildProjectMetadata Include="Platform: $(Platform)" />
+      <DotNetCliBuildProjectMetadata Include="PlatformTarget: $(PlatformTarget)" />
+      <DotNetCliBuildProjectMetadata Include="ProjectAssetsFile: $(ProjectAssetsFile)" />
+      <DotNetCliBuildProjectMetadata Include="ProjectDir: $(ProjectDir)" />
+      <DotNetCliBuildProjectMetadata Include="RootNamespace: $(RootNamespace)" />
+      <DotNetCliBuildProjectMetadata Include="RuntimeFrameworkVersion: $(RuntimeFrameworkVersion)" />
+      <DotNetCliBuildProjectMetadata Include="TargetFileName: $(TargetFileName)" />
+      <DotNetCliBuildProjectMetadata Include="TargetFrameworkMoniker: $(TargetFrameworkMoniker)" />
+    </ItemGroup>
+    <WriteLinesToFile Condition=" '$(TargetFramework)' != '' "
+                      File="$(DotNetCliBuildMetadataFile)"
+                      Lines="@(DotNetCliBuildProjectMetadata)" />
+  </Target>
+</Project>

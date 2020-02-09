@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DotNet.Cli.Build\DotNet.Cli.Build.csproj" />
     <ProjectReference Include="..\GenerateClientCommand\GenerateClientCommand.csproj" />
   </ItemGroup>
   
