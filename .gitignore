@@ -339,4 +339,4 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-/TestApp/Properties/debug-paths.txt
+/GenerateAspNetCoreClient/Properties/debug-paths.txt

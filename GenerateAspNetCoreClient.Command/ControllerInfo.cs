@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Controllers;
 
-namespace GenerateClientCommand
+namespace GenerateAspNetCoreClient.Command
 {
     internal struct ControllerInfo
     {

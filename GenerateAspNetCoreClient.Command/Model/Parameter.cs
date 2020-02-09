@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenerateClientCommand.Model
+namespace GenerateAspNetCoreClient.Command.Model
 {
     public class Parameter
     {

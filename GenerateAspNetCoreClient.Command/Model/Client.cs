@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GenerateClientCommand.Model
+namespace GenerateAspNetCoreClient.Command.Model
 {
     public class Client
     {

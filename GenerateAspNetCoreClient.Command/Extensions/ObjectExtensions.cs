@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenerateClientCommand.Extensions
+namespace GenerateAspNetCoreClient.Command.Extensions
 {
     internal static class ObjectExtensions
     {

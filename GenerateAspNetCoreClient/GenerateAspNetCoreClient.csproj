@@ -7,7 +7,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DotNet.Cli.Build\DotNet.Cli.Build.csproj" />
-    <ProjectReference Include="..\GenerateClientCommand\GenerateClientCommand.csproj" />
+    <ProjectReference Include="..\GenerateAspNetCoreClient.Command\GenerateAspNetCoreClient.Command.csproj" />
+    <ProjectReference Include="..\GenerateAspNetCoreClient.Options\GenerateAspNetCoreClient.Options.csproj" />
   </ItemGroup>
   
 </Project>

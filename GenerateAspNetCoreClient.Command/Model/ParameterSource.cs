@@ -1,4 +1,4 @@
-﻿namespace GenerateClientCommand.Model
+﻿namespace GenerateAspNetCoreClient.Command.Model
 {
     public enum ParameterSource
     {

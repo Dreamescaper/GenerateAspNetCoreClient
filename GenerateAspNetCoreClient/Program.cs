@@ -4,9 +4,10 @@ using System.Linq;
 using System.Runtime.Loader;
 using CommandLine;
 using DotNet.Cli.Build;
-using Options;
+using GenerateAspNetCoreClient.Command;
+using GenerateAspNetCoreClient.Options;
 
-namespace TestApp
+namespace GenerateAspNetCoreClient
 {
     public class Program
     {
@@ -27,7 +28,7 @@ namespace TestApp
             AssemblyLoadContext.Default.Resolving += (_, name) => context.LoadInternal(name);
 
             var webProjectAssembly = context.LoadFromAssemblyPath(assemblyPath);
-            var commandAssembly = context.LoadFromAssemblyPath(typeof(GenerateClientCommand.GenerateClientCommand).Assembly.Location);
+            var commandAssembly = context.LoadFromAssemblyPath(typeof(GenerateClientCommand).Assembly.Location);
 
             commandAssembly.GetTypes().First(t => t.Name == "GenerateClientCommand")
                 .GetMethod("Invoke")

@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace Options
+namespace GenerateAspNetCoreClient.Options
 {
     public class GenerateClientOptions
     {

@@ -5,8 +5,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
-using GenerateClientCommand.Extensions;
-using GenerateClientCommand.Model;
+using GenerateAspNetCoreClient.Command.Extensions;
+using GenerateAspNetCoreClient.Command.Model;
+using GenerateAspNetCoreClient.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -14,9 +15,8 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Hosting;
 using Namotion.Reflection;
-using Options;
 
-namespace GenerateClientCommand
+namespace GenerateAspNetCoreClient.Command
 {
     public class GenerateClientCommand
     {

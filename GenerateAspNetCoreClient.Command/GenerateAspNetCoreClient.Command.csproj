@@ -16,7 +16,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Options\Options.csproj" />
+    <ProjectReference Include="..\GenerateAspNetCoreClient.Options\GenerateAspNetCoreClient.Options.csproj" />
   </ItemGroup>
   
 </Project>

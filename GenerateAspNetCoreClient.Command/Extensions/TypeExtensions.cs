@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GenerateClientCommand.Extensions
+namespace GenerateAspNetCoreClient.Command.Extensions
 {
     internal static class TypeExtensions
     {
