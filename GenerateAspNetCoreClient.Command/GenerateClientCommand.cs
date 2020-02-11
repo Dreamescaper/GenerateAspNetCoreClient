@@ -256,7 +256,7 @@ namespace {clientModel.Namespace}
             var clients = controllerApiDescriptions.Select(apis =>
                 GetClientModel(
                     commonControllerNamespace: commonControllerNamespacePart,
-                    outputNamespace: options.Namespace,
+                    options: options,
                     additionalNamespaces: additionalNamespaces,
                     controllerInfo: apis.Key,
                     apiDescriptions: apis.ToList(),
@@ -268,7 +268,7 @@ namespace {clientModel.Namespace}
 
         private static Client GetClientModel(
             string commonControllerNamespace,
-            string outputNamespace,
+            GenerateClientOptions options,
             string[] additionalNamespaces,
             ControllerInfo controllerInfo,
             List<ApiDescription> apiDescriptions,
@@ -278,8 +278,8 @@ namespace {clientModel.Namespace}
 
             var subPath = GetSubPath(controllerInfo, commonControllerNamespace);
 
-            var name = $"I{controllerInfo.ControllerName}Api";
-            var clientNamespace = string.Join(".", new[] { outputNamespace }.Concat(subPath));
+            var name = options.TypeNamePattern.Replace("[controller]", controllerInfo.ControllerName);
+            var clientNamespace = string.Join(".", new[] { options.Namespace }.Concat(subPath));
 
             var namespaces = GetNamespaces(apiDescriptions, ambiguousTypes)
                 .Concat(additionalNamespaces)

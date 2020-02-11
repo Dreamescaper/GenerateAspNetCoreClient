@@ -13,6 +13,9 @@ namespace GenerateAspNetCoreClient.Options
         [Option('n', "namespace", Required = true, HelpText = "Namespace for generated client types.")]
         public string Namespace { get; set; } = "Client";
 
+        [Option("type-name-pattern", Required = false, Default = "I[controller]Api", HelpText = "Pattern by which client types are named.")]
+        public string TypeNamePattern { get; set; } = "I[controller]Api";
+
         [Option("exclude-types", Required = false, HelpText = "Exclude all controller types with substring in full name.")]
         public string? ExcludeTypes { get; set; }
 
