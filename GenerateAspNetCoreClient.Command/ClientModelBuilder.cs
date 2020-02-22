@@ -59,7 +59,6 @@ namespace GenerateAspNetCoreClient.Command
             var clients = controllerApiDescriptions.Select(apis =>
                 GetClientModel(
                     commonControllerNamespace: commonControllerNamespacePart,
-                    outputNamespace: options.Namespace,
                     additionalNamespaces: additionalNamespaces,
                     controllerInfo: apis.Key,
                     apiDescriptions: apis.ToList(),
@@ -69,9 +68,8 @@ namespace GenerateAspNetCoreClient.Command
             return new ClientCollection(clients, ambiguousTypes);
         }
 
-        private static Client GetClientModel(
+        private Client GetClientModel(
             string commonControllerNamespace,
-            string outputNamespace,
             string[] additionalNamespaces,
             ControllerInfo controllerInfo,
             List<ApiDescription> apiDescriptions,
@@ -81,8 +79,8 @@ namespace GenerateAspNetCoreClient.Command
 
             var subPath = GetSubPath(controllerInfo, commonControllerNamespace);
 
-            var name = $"I{controllerInfo.ControllerName}Api";
-            var clientNamespace = string.Join(".", new[] { outputNamespace }.Concat(subPath));
+            var name = options.TypeNamePattern.Replace("[controller]", controllerInfo.ControllerName);
+            var clientNamespace = string.Join(".", new[] { options.Namespace }.Concat(subPath));
 
             var namespaces = GetNamespaces(apiDescriptions, ambiguousTypes)
                 .Concat(additionalNamespaces)
@@ -102,7 +100,7 @@ namespace GenerateAspNetCoreClient.Command
             );
         }
 
-        private static EndpointMethod GetEndpointMethod(ApiDescription apiDescription)
+        private EndpointMethod GetEndpointMethod(ApiDescription apiDescription)
         {
             var responseType = GetResponseType(apiDescription);
 
@@ -123,7 +121,7 @@ namespace GenerateAspNetCoreClient.Command
             );
         }
 
-        private static List<Parameter> GetParameters(ApiDescription apiDescription)
+        private List<Parameter> GetParameters(ApiDescription apiDescription)
         {
             var parametersList = new List<Parameter>();
 

@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "TestApp": {
+    "GenerateAspNetCoreClient": {
       "commandName": "Project",
       "commandLineArgs": "\"..\\..\\..\\..\\Tests\\ApiExplorerTest\\ApiExplorerWebApiTest.csproj\" -o \"..\\..\\..\\..\\Tests\\OutputTest\" -n \"TestClient\""
     }
