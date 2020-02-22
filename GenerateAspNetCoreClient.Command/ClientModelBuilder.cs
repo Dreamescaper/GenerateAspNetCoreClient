@@ -312,7 +312,10 @@ namespace GenerateAspNetCoreClient.Command
         {
             return (controllerActionDescriptor.ControllerTypeInfo.Namespace ?? "")
                 .Substring(commonNamespace.Length)
-                .Split(".", StringSplitOptions.RemoveEmptyEntries);
+                .Split(".")
+                .Select(nsPart => nsPart.Replace("Controllers", ""))
+                .Where(nsPart => nsPart != "")
+                .ToArray();
         }
 
         private static List<ApiDescription> HandleDuplicates(List<ApiDescription> apiDescriptions)

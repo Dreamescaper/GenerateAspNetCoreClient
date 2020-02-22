@@ -1,6 +1,6 @@
 using System;
 
-namespace ApiExplorerTest
+namespace ApiExplorerWebApiTest
 {
     public class WeatherForecast
     {
