@@ -14,4 +14,4 @@ jobs:
       with:
         dotnet-version: 3.1.100
     - name: Pack
-      run: dotnet pack GenerateAspNetCoreClient --c Release
+      run: dotnet pack GenerateAspNetCoreClient -c Release
