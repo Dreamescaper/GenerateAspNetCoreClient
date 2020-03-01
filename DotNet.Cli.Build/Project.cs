@@ -27,6 +27,7 @@ namespace DotNet.Cli.Build
         public string AssemblyName { get; set; }
         public string Language { get; set; }
         public string OutputPath { get; set; }
+        public string PublishDir { get; set; }
         public string PlatformTarget { get; set; }
         public string ProjectAssetsFile { get; set; }
         public string ProjectDir { get; set; }
@@ -35,6 +36,7 @@ namespace DotNet.Cli.Build
         public string TargetFileName { get; set; }
         public string TargetFrameworkMoniker { get; set; }
 
+        public string PublishFilePath => Path.Combine(ProjectDir, PublishDir, TargetFileName);
         public string OutputFilePath => Path.Combine(ProjectDir, OutputPath, TargetFileName);
 
         public static Project FromPath(
@@ -53,13 +55,13 @@ namespace DotNet.Cli.Build
 
             Directory.CreateDirectory(buildExtensionsDir);
 
-            var efTargetsPath = Path.Combine(
+            var dotnetCliTargetsPath = Path.Combine(
                 buildExtensionsDir,
                 Path.GetFileName(file) + ".DotNetCliBuild.targets");
             using (var input = typeof(Project).Assembly.GetManifestResourceStream(
                 "DotNet.Cli.Build.Resources.DotNetCliBuild.targets"))
 
-            using (var output = File.OpenWrite(efTargetsPath))
+            using (var output = File.OpenWrite(dotnetCliTargetsPath))
             {
                 input.CopyTo(output);
             }
@@ -124,6 +126,7 @@ namespace DotNet.Cli.Build
                 AssemblyName = metadata["AssemblyName"],
                 Language = metadata["Language"],
                 OutputPath = metadata["OutputPath"],
+                PublishDir = metadata["PublishDir"],
                 PlatformTarget = platformTarget,
                 ProjectAssetsFile = metadata["ProjectAssetsFile"],
                 ProjectDir = metadata["ProjectDir"],
@@ -171,20 +174,54 @@ namespace DotNet.Cli.Build
             }
         }
 
+        public void Publish()
+        {
+            var args = new List<string> { "publish" };
+
+            if (_file != null)
+            {
+                args.Add(_file);
+            }
+
+            if (_framework != null)
+            {
+                args.Add("--framework");
+                args.Add(_framework);
+            }
+
+            if (_configuration != null)
+            {
+                args.Add("--configuration");
+                args.Add(_configuration);
+            }
+
+            if (_runtime != null)
+            {
+                args.Add("--runtime");
+                args.Add(_runtime);
+            }
+
+            args.Add("/verbosity:quiet");
+            args.Add("/nologo");
+
+            var exitCode = Exe.Run("dotnet", args, interceptOutput: true);
+            if (exitCode != 0)
+            {
+                throw new Exception("PublishFailed");
+            }
+        }
+
         private static string GetProjectFilePath(string path)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
 
-            if (Path.GetExtension(path).Length > 0)
+            if (File.Exists(path))
             {
-                if (!File.Exists(path))
-                    throw new ArgumentException("Specified path does not exist");
-
                 // If path is file - return as is
                 return path;
             }
-            else
+            else if (Directory.Exists(path))
             {
                 // If path is directory - try finding csproj file
                 var csprojFiles = Directory.GetFiles(path, "*.csproj");
@@ -196,6 +233,10 @@ namespace DotNet.Cli.Build
                     throw new ArgumentException("Multiple project files found");
 
                 return csprojFiles[0];
+            }
+            else
+            {
+                throw new ArgumentException("Specified path does not exist");
             }
         }
     }

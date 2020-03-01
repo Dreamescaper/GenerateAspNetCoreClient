@@ -9,6 +9,7 @@
       <DotNetCliBuildProjectMetadata Include="AssemblyName: $(AssemblyName)" />
       <DotNetCliBuildProjectMetadata Include="Language: $(Language)" />
       <DotNetCliBuildProjectMetadata Include="OutputPath: $(OutputPath)" />
+      <DotNetCliBuildProjectMetadata Include="PublishDir: $(PublishDir)" />
       <DotNetCliBuildProjectMetadata Include="Platform: $(Platform)" />
       <DotNetCliBuildProjectMetadata Include="PlatformTarget: $(PlatformTarget)" />
       <DotNetCliBuildProjectMetadata Include="ProjectAssetsFile: $(ProjectAssetsFile)" />

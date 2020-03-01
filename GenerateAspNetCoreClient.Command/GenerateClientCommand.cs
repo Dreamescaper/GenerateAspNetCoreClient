@@ -123,7 +123,7 @@ namespace GenerateAspNetCoreClient.Command
 
 namespace {clientModel.Namespace}
 {{
-    public interface {clientModel.Name}
+    {clientModel.AccessModifier} interface {clientModel.Name}
     {{
 {string.Join(Environment.NewLine + Environment.NewLine, methodDescriptions).Indent("        ")}
     }}

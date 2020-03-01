@@ -6,11 +6,13 @@ namespace GenerateAspNetCoreClient
     internal class CustomLoadContext : AssemblyLoadContext
     {
         private readonly AssemblyDependencyResolver dependencyResolver;
+        private readonly string assemblyPath;
         private readonly Assembly sharedAssemply;
 
         public CustomLoadContext(string assemblyPath, Assembly sharedAssemply)
         {
             dependencyResolver = new AssemblyDependencyResolver(assemblyPath);
+            this.assemblyPath = assemblyPath;
             this.sharedAssemply = sharedAssemply;
         }
 

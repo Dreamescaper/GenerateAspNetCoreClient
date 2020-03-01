@@ -95,6 +95,7 @@ namespace GenerateAspNetCoreClient.Command
                 location: Path.Combine(subPath),
                 importedNamespaces: namespaces,
                 @namespace: clientNamespace,
+                accessModifier: options.AccessModifier,
                 name: name,
                 endpointMethods: methods
             );

@@ -42,10 +42,13 @@ namespace GenerateAspNetCoreClient
                 // If path is .dll file - return straight away 
                 return Path.GetFullPath(path);
             }
-
-            var project = Project.FromPath(path);
-            project.Build();
-            return project.OutputFilePath;
+            else
+            {
+                // Otherwise - publish the project and return built .dll
+                var project = Project.FromPath(path);
+                project.Publish();
+                return project.PublishFilePath;
+            }
         }
     }
 }
