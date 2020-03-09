@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ApiExplorerWebApiTest.Controllers
+namespace TestWebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]

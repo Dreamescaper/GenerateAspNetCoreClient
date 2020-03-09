@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.29521.150
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5B396B83-C3D1-422E-AF7A-5D99602B3C05}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiExplorerWebApiTest", "Tests\ApiExplorerTest\ApiExplorerWebApiTest.csproj", "{577060E2-8ABD-4BEE-83A5-2E8638CF6654}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApi", "Tests\ApiExplorerTest\TestWebApi.csproj", "{577060E2-8ABD-4BEE-83A5-2E8638CF6654}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OutputTest", "Tests\OutputTest\OutputTest.csproj", "{43DDF7F9-8F47-49EC-B919-923E06D86AB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OutputProject", "Tests\OutputTest\OutputProject.csproj", "{43DDF7F9-8F47-49EC-B919-923E06D86AB7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNet.Cli.Build", "DotNet.Cli.Build\DotNet.Cli.Build.csproj", "{C3DB14C0-A82D-4CF4-A91D-79941D94DB01}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateAspNetCoreClient.Command", "GenerateAspNetCoreClient.Command\GenerateAspNetCoreClient.Command.csproj", "{7D888E94-98B4-4A56-90BC-91DE791539CA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateAspNetCoreClient.Options", "GenerateAspNetCoreClient.Options\GenerateAspNetCoreClient.Options.csproj", "{11A0969A-9BE9-4E7A-9DC5-300CBEDC0A45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateAspNetCoreClient.Tests", "Tests\GenerateAspNetCoreClient.Tests\GenerateAspNetCoreClient.Tests.csproj", "{2543B4D5-D0A3-40E9-978B-A872674CF825}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{11A0969A-9BE9-4E7A-9DC5-300CBEDC0A45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11A0969A-9BE9-4E7A-9DC5-300CBEDC0A45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11A0969A-9BE9-4E7A-9DC5-300CBEDC0A45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2543B4D5-D0A3-40E9-978B-A872674CF825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2543B4D5-D0A3-40E9-978B-A872674CF825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2543B4D5-D0A3-40E9-978B-A872674CF825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2543B4D5-D0A3-40E9-978B-A872674CF825}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +60,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{577060E2-8ABD-4BEE-83A5-2E8638CF6654} = {5B396B83-C3D1-422E-AF7A-5D99602B3C05}
 		{43DDF7F9-8F47-49EC-B919-923E06D86AB7} = {5B396B83-C3D1-422E-AF7A-5D99602B3C05}
+		{2543B4D5-D0A3-40E9-978B-A872674CF825} = {5B396B83-C3D1-422E-AF7A-5D99602B3C05}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {89A98ED1-2D66-4D68-A36D-39A8F4ADB399}

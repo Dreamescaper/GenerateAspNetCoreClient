@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace ApiExplorerWebApiTest.Controllers
+namespace TestWebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]

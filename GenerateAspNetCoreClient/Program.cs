@@ -18,7 +18,7 @@ namespace GenerateAspNetCoreClient
                 .WithParsed(options => CreateClient(options));
         }
 
-        private static void CreateClient(GenerateClientOptions options)
+        internal static void CreateClient(GenerateClientOptions options)
         {
             var assemblyPath = GetAssemblyPath(options.InputPath);
             var directory = Path.GetDirectoryName(assemblyPath);

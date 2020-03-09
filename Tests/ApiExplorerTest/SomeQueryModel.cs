@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ApiExplorerWebApiTest
+namespace TestWebApi
 {
     public class SomeQueryModel
     {
