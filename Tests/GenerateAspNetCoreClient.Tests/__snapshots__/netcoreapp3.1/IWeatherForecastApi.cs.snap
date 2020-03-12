@@ -28,5 +28,8 @@ namespace Test.Name.Space
 
         [Post("/WeatherForecast/{id}/queryParams")]
         Task<WeatherForecast> SomethingWithQueryParams(int id, string par1 = null, string par2 = "1");
+
+        [Patch("/WeatherForecast/headerParams")]
+        Task WithHeaderParams([Header("x-header-name")] string headerParam = null);
     }
 }

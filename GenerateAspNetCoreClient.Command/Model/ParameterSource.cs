@@ -5,6 +5,7 @@
         Path,
         Query,
         Body,
-        File
+        File,
+        Header
     }
 }

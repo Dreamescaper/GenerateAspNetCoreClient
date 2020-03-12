@@ -73,5 +73,12 @@ namespace TestWebApi.Controllers
         {
             return null;
         }
+
+        [HttpPatch("headerParams")]
+        public async Task<ActionResult> WithHeaderParams([FromHeader(Name = "x-header-name")] string headerParam)
+        {
+            await Task.Delay(1);
+            return Ok();
+        }
     }
 }

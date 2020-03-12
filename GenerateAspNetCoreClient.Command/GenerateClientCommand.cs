@@ -101,10 +101,16 @@ namespace GenerateAspNetCoreClient.Command
                 var parameterStrings = endpointMethod.Parameters
                     .Select(p =>
                     {
-                        var attribute = p.Source == ParameterSource.Body ? "[Body] " : "";
+                        var attribute = p.Source switch
+                        {
+                            ParameterSource.Body => "[Body] ",
+                            ParameterSource.Header => $"[Header(\"{p.Name}\")] ",
+                            _ => ""
+                        };
+
                         var type = p.Source == ParameterSource.File ? "MultipartItem" : p.Type.GetName(ambiguousTypes);
                         var defaultValue = p.DefaultValueLiteral == null ? "" : " = " + p.DefaultValueLiteral;
-                        return $"{attribute}{type} {p.Name}{defaultValue}";
+                        return $"{attribute}{type} {p.ParameterName}{defaultValue}";
                     })
                     .ToArray();
 

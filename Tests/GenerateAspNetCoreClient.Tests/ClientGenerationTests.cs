@@ -44,7 +44,7 @@ namespace GenerateAspNetCoreClient.Tests
 
             if (Directory.Exists(setPath))
             {
-                Directory.Delete(setPath);
+                Directory.Delete(setPath, recursive: true);
             }
 
             Directory.CreateDirectory(setPath);

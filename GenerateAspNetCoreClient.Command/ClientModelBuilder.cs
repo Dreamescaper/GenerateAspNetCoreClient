@@ -140,7 +140,8 @@ namespace GenerateAspNetCoreClient.Command
                     parametersList.Add(new Parameter(
                         source: ParameterSource.File,
                         type: typeof(IFormFile),
-                        name: name.ToCamelCase(),
+                        name: parameterDescription.Name,
+                        parameterName: name.ToCamelCase(),
                         defaultValueLiteral: null));
 
                     // Skip parameters that correspond to same file
@@ -166,8 +167,18 @@ namespace GenerateAspNetCoreClient.Command
                     "Path" => ParameterSource.Path,
                     "FormFile" => ParameterSource.File,
                     "Query" => ParameterSource.Query,
+                    "Header" => ParameterSource.Header,
                     _ => ParameterSource.Query
                 };
+
+                var isQueryModel = source == ParameterSource.Query
+                    && parameterDescription.Type != parameterDescription.ParameterDescriptor?.ParameterType;
+
+                // If query model - use parameterDescription.Name, as ParameterDescriptor.Name is name for the whole model,
+                // not separate parameters.
+                var parameterName = isQueryModel
+                    ? parameterDescription.Name.ToCamelCase()
+                    : (parameterDescription.ParameterDescriptor?.Name ?? parameterDescription.Name).ToCamelCase();
 
                 var defaultValue = GetDefaultValueLiteral(parameterDescription);
 
@@ -181,7 +192,8 @@ namespace GenerateAspNetCoreClient.Command
                 parametersList.Add(new Parameter(
                     source: source,
                     type: type,
-                    name: parameterDescription.Name.ToCamelCase(),
+                    name: parameterDescription.Name,
+                    parameterName: parameterName,
                     defaultValueLiteral: defaultValue));
             }
 
