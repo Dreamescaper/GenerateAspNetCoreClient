@@ -8,12 +8,22 @@
     <ToolCommandName>dotnet-generate-client</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
     <Version>0.0.1</Version>
+    <RepositoryUrl>https://github.com/Dreamescaper/GenerateAspNetCoreClient</RepositoryUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageId>GenerateAspNetCoreClient.Refit</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DotNet.Cli.Build\DotNet.Cli.Build.csproj" />
     <ProjectReference Include="..\GenerateAspNetCoreClient.Command\GenerateAspNetCoreClient.Command.csproj" />
     <ProjectReference Include="..\GenerateAspNetCoreClient.Options\GenerateAspNetCoreClient.Options.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
   
 </Project>
