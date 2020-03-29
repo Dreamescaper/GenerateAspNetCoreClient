@@ -1,18 +1,20 @@
-﻿using System;
-using CommandLine;
+﻿using CommandLine;
 
 namespace GenerateAspNetCoreClient.Options
 {
     public class GenerateClientOptions
     {
         [Value(0, HelpText = "Relative path for input web assembly.")]
-        public string InputPath { get; set; } = Environment.CurrentDirectory;
+        public string InputPath { get; set; } = System.Environment.CurrentDirectory;
 
         [Option('o', "out-path", Required = true, HelpText = "Relative out path for generated files.")]
         public string OutPath { get; set; } = "";
 
         [Option('n', "namespace", Required = true, HelpText = "Namespace for generated client types.")]
         public string Namespace { get; set; } = "Client";
+
+        [Option("environment", Required = false, HelpText = "Required ASPNETCORE_ENVIRONMENT.")]
+        public string? Environment { get; set; }
 
         [Option("type-name-pattern", Required = false, Default = "I[controller]Api", HelpText = "Pattern by which client types are named.")]
         public string TypeNamePattern { get; set; } = "I[controller]Api";

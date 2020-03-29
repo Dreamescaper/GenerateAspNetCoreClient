@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.Loader;
 using CommandLine;
 using DotNet.Cli.Build;
 using GenerateAspNetCoreClient.Command;
@@ -25,7 +24,6 @@ namespace GenerateAspNetCoreClient
 
             var sharedOptionsAssembly = typeof(GenerateClientOptions).Assembly;
             var context = new CustomLoadContext(assemblyPath, sharedOptionsAssembly);
-            AssemblyLoadContext.Default.Resolving += (_, name) => context.LoadInternal(name);
 
             var webProjectAssembly = context.LoadFromAssemblyPath(assemblyPath);
             var commandAssembly = context.LoadFromAssemblyPath(typeof(GenerateClientCommand).Assembly.Location);

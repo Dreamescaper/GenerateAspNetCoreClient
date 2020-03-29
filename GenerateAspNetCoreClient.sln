@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateAspNetCoreClient.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateAspNetCoreClient.Options", "GenerateAspNetCoreClient.Options\GenerateAspNetCoreClient.Options.csproj", "{11A0969A-9BE9-4E7A-9DC5-300CBEDC0A45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateAspNetCoreClient.Tests", "Tests\GenerateAspNetCoreClient.Tests\GenerateAspNetCoreClient.Tests.csproj", "{2543B4D5-D0A3-40E9-978B-A872674CF825}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateAspNetCoreClient.Tests", "Tests\GenerateAspNetCoreClient.Tests\GenerateAspNetCoreClient.Tests.csproj", "{2543B4D5-D0A3-40E9-978B-A872674CF825}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
