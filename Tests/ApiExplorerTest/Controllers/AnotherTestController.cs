@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TestWebApi.Models;
 
 namespace TestWebApi.Controllers
 {

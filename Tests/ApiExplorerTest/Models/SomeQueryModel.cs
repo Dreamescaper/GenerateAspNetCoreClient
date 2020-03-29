@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TestWebApi
+namespace TestWebApi.Models
 {
     public class SomeQueryModel
     {

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using TestWebApi.Models;
 
 namespace TestWebApi.Controllers
 {
@@ -17,13 +17,6 @@ namespace TestWebApi.Controllers
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
-
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
-        {
-            _logger = logger;
-        }
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
@@ -38,6 +31,12 @@ namespace TestWebApi.Controllers
             .ToArray();
         }
 
+        /// <summary>
+        /// Get weather forecast by Id.
+        /// </summary>
+        /// <param name="id">some id.</param>
+        /// <param name="cancellationToken">cancellation Token.</param>
+        /// <returns><see cref="WeatherForecast"/> with matching id.</returns>
         [HttpGet("{id}")]
         public WeatherForecast Get(Guid id, CancellationToken cancellationToken)
         {

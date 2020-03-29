@@ -35,7 +35,7 @@ namespace GenerateAspNetCoreClient.Tests
             GenerateAspNetCoreClient.Program.CreateClient(options);
 
             Assert.That(() => Project.FromPath(_outProjectPath).Build(), Throws.Nothing);
-            AssertSnapshotMatch("netcoreapp3.1");
+            RegenerateSnapshots("netcoreapp3.1");
         }
 
         private void RegenerateSnapshots(string name)
