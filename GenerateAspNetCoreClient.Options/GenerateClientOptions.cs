@@ -25,10 +25,16 @@ namespace GenerateAspNetCoreClient.Options
         [Option("add-cancellation-token", Required = false, Default = false, HelpText = "Add CancellationToken parameters to all endpoints.")]
         public bool AddCancellationTokenParameters { get; set; }
 
-        [Option("exclude-types", Required = false, HelpText = "Exclude all controller types with substring in full name.")]
+        [Option("exclude-types", Required = false, HelpText = "Exclude all controller types with substring in full name (including namespace).")]
         public string? ExcludeTypes { get; set; }
 
         [Option("exclude-paths", Required = false, HelpText = "Exclude all endpoints with substring in relative path.")]
         public string? ExcludePaths { get; set; }
+
+        [Option("include-types", Required = false, HelpText = "Include only controller types with substring in full name (including namespace).")]
+        public string? IncludeTypes { get; set; }
+
+        [Option("include-paths", Required = false, HelpText = "Include only endpoints with substring in relative path.")]
+        public string? IncludePaths { get; set; }
     }
 }

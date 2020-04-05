@@ -34,15 +34,19 @@ namespace GenerateAspNetCoreClient.Tests
             string actionName = "Get",
             string path = "WeatherForecast/{id}",
             IList<ApiParameterDescription> apiParameters = null,
-            Type responseType = null)
+            Type responseType = null,
+            Type controllerType = null)
         {
+            controllerType ??= typeof(WeatherForecastController);
+
             var apiDescription = new ApiDescription
             {
                 ActionDescriptor = new ControllerActionDescriptor
                 {
                     ActionName = actionName,
-                    ControllerTypeInfo = typeof(WeatherForecastController).GetTypeInfo(),
-                    DisplayName = $"TestWebApi.Controllers.WeatherForecastController.{actionName} (TestWebApi)",
+                    ControllerName = controllerType.Name.Replace("Controller", ""),
+                    ControllerTypeInfo = controllerType.GetTypeInfo(),
+                    DisplayName = $"{controllerType.FullName}.{actionName} ({controllerType.Assembly.GetName().Name})",
                     MethodInfo = typeof(WeatherForecastController).GetMethod("Get", Array.Empty<Type>())
                 },
                 HttpMethod = httpMethod,

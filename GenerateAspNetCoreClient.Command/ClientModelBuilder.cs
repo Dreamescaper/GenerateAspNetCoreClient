@@ -38,16 +38,7 @@ namespace GenerateAspNetCoreClient.Command
                 .Where(i => i.ActionDescriptor is ControllerActionDescriptor)
                 .ToList();
 
-            if (!string.IsNullOrEmpty(options.ExcludeTypes))
-            {
-                apiDescriptions.RemoveAll(api
-                    => ((ControllerActionDescriptor)api.ActionDescriptor).ControllerTypeInfo.FullName?.Contains(options.ExcludeTypes) == true);
-            }
-
-            if (!string.IsNullOrEmpty(options.ExcludePaths))
-            {
-                apiDescriptions.RemoveAll(api => ("/" + api.RelativePath).Contains(options.ExcludePaths));
-            }
+            FilterDescriptions(apiDescriptions);
 
             var allNamespaces = GetNamespaces(apiDescriptions);
             var ambiguousTypes = GetAmbiguousTypes(allNamespaces);
@@ -66,6 +57,31 @@ namespace GenerateAspNetCoreClient.Command
                 ).ToList();
 
             return new ClientCollection(clients, ambiguousTypes);
+        }
+
+        private void FilterDescriptions(List<ApiDescription> apiDescriptions)
+        {
+            if (!string.IsNullOrEmpty(options.ExcludeTypes))
+            {
+                apiDescriptions.RemoveAll(api
+                    => ((ControllerActionDescriptor)api.ActionDescriptor).ControllerTypeInfo.FullName?.Contains(options.ExcludeTypes) == true);
+            }
+
+            if (!string.IsNullOrEmpty(options.IncludeTypes))
+            {
+                apiDescriptions.RemoveAll(api
+                    => ((ControllerActionDescriptor)api.ActionDescriptor).ControllerTypeInfo.FullName?.Contains(options.IncludeTypes) != true);
+            }
+
+            if (!string.IsNullOrEmpty(options.ExcludePaths))
+            {
+                apiDescriptions.RemoveAll(api => ("/" + api.RelativePath).Contains(options.ExcludePaths));
+            }
+
+            if (!string.IsNullOrEmpty(options.IncludePaths))
+            {
+                apiDescriptions.RemoveAll(api => !("/" + api.RelativePath).Contains(options.IncludePaths));
+            }
         }
 
         internal Client GetClientModel(
