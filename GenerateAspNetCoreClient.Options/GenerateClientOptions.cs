@@ -22,6 +22,9 @@ namespace GenerateAspNetCoreClient.Options
         [Option("access-modifier", Required = false, Default = "public", HelpText = "Access modifier used for generated clients.")]
         public string AccessModifier { get; set; } = "public";
 
+        [Option("add-cancellation-token", Required = false, Default = false, HelpText = "Add CancellationToken parameters to all endpoints.")]
+        public bool AddCancellationTokenParameters { get; set; }
+
         [Option("exclude-types", Required = false, HelpText = "Exclude all controller types with substring in full name.")]
         public string? ExcludeTypes { get; set; }
 

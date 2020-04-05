@@ -6,6 +6,7 @@
         Query,
         Body,
         File,
-        Header
+        Header,
+        Other
     }
 }

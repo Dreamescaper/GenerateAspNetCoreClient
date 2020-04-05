@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\GenerateAspNetCoreClient\GenerateAspNetCoreClient.csproj" />
+    <ProjectReference Include="..\ApiExplorerTest\TestWebApi.csproj" />
   </ItemGroup>
 
 </Project>

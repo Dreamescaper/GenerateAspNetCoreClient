@@ -68,7 +68,7 @@ namespace GenerateAspNetCoreClient.Command
             return new ClientCollection(clients, ambiguousTypes);
         }
 
-        private Client GetClientModel(
+        internal Client GetClientModel(
             string commonControllerNamespace,
             string[] additionalNamespaces,
             ControllerInfo controllerInfo,
@@ -83,17 +83,21 @@ namespace GenerateAspNetCoreClient.Command
             var clientNamespace = string.Join(".", new[] { options.Namespace }.Concat(subPath));
 
             var namespaces = GetNamespaces(apiDescriptions, ambiguousTypes)
-                .Concat(additionalNamespaces)
+                .Concat(additionalNamespaces);
+
+            if (options.AddCancellationTokenParameters)
+                namespaces = namespaces.Append("System.Threading");
+
+            namespaces = namespaces
                 .OrderByDescending(ns => ns.StartsWith("System"))
-                .ThenBy(ns => ns)
-                .ToList();
+                .ThenBy(ns => ns);
 
             var methods = apiDescriptions.Select(GetEndpointMethod).ToList();
 
             return new Client
             (
                 location: Path.Combine(subPath),
-                importedNamespaces: namespaces,
+                importedNamespaces: namespaces.ToList(),
                 @namespace: clientNamespace,
                 accessModifier: options.AccessModifier,
                 name: name,
@@ -101,7 +105,7 @@ namespace GenerateAspNetCoreClient.Command
             );
         }
 
-        private EndpointMethod GetEndpointMethod(ApiDescription apiDescription)
+        internal EndpointMethod GetEndpointMethod(ApiDescription apiDescription)
         {
             var responseType = GetResponseType(apiDescription);
 
@@ -122,7 +126,7 @@ namespace GenerateAspNetCoreClient.Command
             );
         }
 
-        private List<Parameter> GetParameters(ApiDescription apiDescription)
+        internal List<Parameter> GetParameters(ApiDescription apiDescription)
         {
             var parametersList = new List<Parameter>();
 
@@ -195,6 +199,16 @@ namespace GenerateAspNetCoreClient.Command
                     name: parameterDescription.Name,
                     parameterName: parameterName,
                     defaultValueLiteral: defaultValue));
+            }
+
+            if (options.AddCancellationTokenParameters)
+            {
+                parametersList.Add(new Parameter(
+                    source: ParameterSource.Other,
+                    type: typeof(CancellationToken),
+                    name: "cancellationToken",
+                    parameterName: "cancellationToken",
+                    defaultValueLiteral: "default"));
             }
 
             return parametersList;
