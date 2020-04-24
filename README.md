@@ -1,7 +1,11 @@
-![Nuget](https://img.shields.io/nuget/v/GenerateAspNetCoreClient.Refit)
+
+[![Nuget](https://img.shields.io/nuget/v/GenerateAspNetCoreClient.Refit)](https://www.nuget.org/packages/GenerateAspNetCoreClient.Refit/)
 
 # GenerateAspNetCoreClient
 DotNet tool to generate [Refit](https://github.com/reactiveui/refit) HTTP client types from ASP.NET Core api controllers.
+
+## Prerequisites
+Tool requires .NET Core 3.1 runtime installed, and it supports projects with ASP.NET Core 3.1 or 2.1.
 
 
 ## Usage
