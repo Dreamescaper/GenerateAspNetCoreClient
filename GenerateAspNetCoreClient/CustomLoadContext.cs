@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.Loader;
 
 namespace GenerateAspNetCoreClient
@@ -12,8 +13,6 @@ namespace GenerateAspNetCoreClient
         {
             dependencyResolver = new AssemblyDependencyResolver(assemblyPath);
             sharedAssemply = sharedAssembly;
-
-            AssemblyLoadContext.Default.Resolving += (_, name) => this.LoadInternal(name);
         }
 
         protected override Assembly Load(AssemblyName assemblyName)
@@ -21,13 +20,26 @@ namespace GenerateAspNetCoreClient
             if (assemblyName.FullName == sharedAssemply.FullName)
                 return sharedAssemply;
 
-            return LoadInternal(assemblyName);
+            var path = dependencyResolver.ResolveAssemblyToPath(assemblyName);
+
+            if (path == null)
+            {
+                var defaultLoaded = AssemblyLoadContext.Default.LoadFromAssemblyName(assemblyName);
+
+                if (defaultLoaded != null)
+                    path = defaultLoaded.Location;
+            }
+
+            return path != null ? LoadFromAssemblyPath(path) : null;
         }
 
-        internal Assembly LoadInternal(AssemblyName assemblyName)
+        protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
         {
-            var path = dependencyResolver.ResolveAssemblyToPath(assemblyName);
-            return path != null ? LoadFromAssemblyPath(path) : null;
+            var resolvedPath = dependencyResolver.ResolveUnmanagedDllToPath(unmanagedDllName);
+
+            return resolvedPath == null
+                ? IntPtr.Zero
+                : LoadUnmanagedDllFromPath(resolvedPath);
         }
     }
 }
