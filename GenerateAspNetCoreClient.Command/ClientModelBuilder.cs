@@ -313,11 +313,18 @@ namespace GenerateAspNetCoreClient.Command
 
                 foreach (var parameterDescription in apiDescription.ParameterDescriptions)
                 {
-                    // Skip FormFile, as it won't be present in result file 
-                    // (not needed for 3.1+)
-                    if (parameterDescription.Source.Id != "FormFile")
+                    switch (parameterDescription.Source.Id)
                     {
-                        AddForType(parameterDescription.Type);
+                        case "FormFile":
+                            // Skip FormFile, as it won't be present in result file 
+                            // (not needed for 3.1+)
+                            break;
+                        case "Form":
+                            AddForType(parameterDescription.ParameterDescriptor.ParameterType);
+                            break;
+                        default:
+                            AddForType(parameterDescription.Type);
+                            break;
                     }
                 }
             }
