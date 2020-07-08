@@ -11,6 +11,8 @@
     <RepositoryUrl>https://github.com/Dreamescaper/GenerateAspNetCoreClient</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageId>GenerateAspNetCoreClient.Refit</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>DotNet tool to generate Refit HTTP client types from ASP.NET Core API controllers.</Description>
   </PropertyGroup>
 
   <ItemGroup>

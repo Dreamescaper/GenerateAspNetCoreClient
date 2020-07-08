@@ -96,10 +96,15 @@ namespace GenerateAspNetCoreClient.Command.Extensions
             if (!@this.IsValueType)
                 return @this;
 
-            if (@this.IsGenericType && @this.GetGenericTypeDefinition() == typeof(Nullable<>))
+            if (IsNullable(@this))
                 return @this;
 
             return typeof(Nullable<>).MakeGenericType(@this);
+        }
+
+        public static bool IsNullable(this Type @this)
+        {
+            return @this.IsGenericType && @this.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
     }
 }

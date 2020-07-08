@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,13 +69,20 @@ namespace TestWebApi.Controllers
         }
 
         [HttpPost("{id}/queryParams")]
-        public Task<WeatherForecast> SomethingWithQueryParams(int id = 1, string par1 = null, string par2 = "1")
+        public Task<WeatherForecast> SomethingWithQueryParams(int id, int par1 = 2, [Required] string par2 = null, string par3 = null, string par4 = "1")
         {
             return null;
         }
 
         [HttpPatch("headerParams")]
         public async Task<ActionResult> WithHeaderParams([FromHeader(Name = "x-header-name")] string headerParam)
+        {
+            await Task.Delay(1);
+            return Ok();
+        }
+
+        [HttpPost("form")]
+        public async Task<ActionResult> WithFormParam([FromForm] SomeQueryModel formParam)
         {
             await Task.Delay(1);
             return Ok();

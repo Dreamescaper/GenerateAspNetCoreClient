@@ -81,11 +81,13 @@ namespace GenerateAspNetCoreClient.Command
                     : "";
 
                 var parameterStrings = endpointMethod.Parameters
+                    .OrderBy(p => p.DefaultValueLiteral != null)
                     .Select(p =>
                     {
                         var attribute = p.Source switch
                         {
                             ParameterSource.Body => "[Body] ",
+                            ParameterSource.Form => "[Body(BodySerializationMethod.UrlEncoded)] ",
                             ParameterSource.Header => $"[Header(\"{p.Name}\")] ",
                             _ => ""
                         };

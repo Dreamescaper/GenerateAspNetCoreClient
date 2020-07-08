@@ -10,7 +10,6 @@ using GenerateAspNetCoreClient.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Namotion.Reflection;
 
 namespace GenerateAspNetCoreClient.Command
@@ -188,6 +187,7 @@ namespace GenerateAspNetCoreClient.Command
                     "FormFile" => ParameterSource.File,
                     "Query" => ParameterSource.Query,
                     "Header" => ParameterSource.Header,
+                    "Form" => ParameterSource.Form,
                     _ => ParameterSource.Query
                 };
 
@@ -200,11 +200,25 @@ namespace GenerateAspNetCoreClient.Command
                     ? parameterDescription.Name.ToCamelCase()
                     : (parameterDescription.ParameterDescriptor?.Name ?? parameterDescription.Name).ToCamelCase();
 
-                var defaultValue = GetDefaultValueLiteral(parameterDescription);
-
                 var type = parameterDescription.Type ?? typeof(string);
 
-                if (defaultValue != null)
+                // API explorer shows form as separate parameters. We want to have single model parameter.
+                if (source == ParameterSource.Form)
+                {
+                    type = parameterDescription.ParameterDescriptor?.ParameterType ?? typeof(object);
+
+                    // Skip parameters that correspond to same form
+                    while (i + 1 < apiDescription.ParameterDescriptions.Count
+                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.ParameterType == type
+                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == parameterName)
+                    {
+                        i++;
+                    }
+                }
+
+                var defaultValue = GetDefaultValueLiteral(parameterDescription, type);
+
+                if (defaultValue == "null")
                 {
                     type = type.ToNullable();
                 }
@@ -326,7 +340,7 @@ namespace GenerateAspNetCoreClient.Command
             }
         }
 
-        private static string? GetDefaultValueLiteral(ApiParameterDescription parameter)
+        private static string? GetDefaultValueLiteral(ApiParameterDescription parameter, Type parameterType)
         {
             // Use reflection for AspNetCore 2.1 compatibility.
             var defaultValue = parameter.TryGetPropertyValue<object>(nameof(parameter.DefaultValue));
@@ -336,15 +350,18 @@ namespace GenerateAspNetCoreClient.Command
                 // If defaultValue is not null - return it.
                 return defaultValue.ToLiteral();
             }
-            else if (parameter.TryGetPropertyValue(nameof(parameter.IsRequired), true) == false)
+
+            var isRequired = parameter.TryGetPropertyValue<bool?>(nameof(parameter.IsRequired)) == true;
+            isRequired |= parameter.ModelMetadata?.IsBindingRequired == true;
+
+            if (!parameterType.IsValueType || parameterType.IsNullable())
             {
-                // If defaultValue is null, but value is not required - return it anyway.
-                return defaultValue.ToLiteral();
+                isRequired |= parameter.ModelMetadata?.IsRequired == true;
             }
 
-            // If query parameter - use default null.
-            if (parameter.Source == BindingSource.Query)
+            if (isRequired == false)
             {
+                // If defaultValue is null, but value is not required - return it anyway.
                 return "null";
             }
 

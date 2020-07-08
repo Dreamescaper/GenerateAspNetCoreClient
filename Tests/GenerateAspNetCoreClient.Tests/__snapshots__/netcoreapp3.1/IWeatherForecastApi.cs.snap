@@ -27,9 +27,12 @@ namespace Test.Name.Space
         Task<WeatherForecast> Search(string name = "test");
 
         [Post("/WeatherForecast/{id}/queryParams")]
-        Task<WeatherForecast> SomethingWithQueryParams(int id, string par1 = null, string par2 = "1");
+        Task<WeatherForecast> SomethingWithQueryParams(int id, string par2, int par1 = 2, string par3 = null, string par4 = "1");
 
         [Patch("/WeatherForecast/headerParams")]
         Task WithHeaderParams([Header("x-header-name")] string headerParam = null);
+
+        [Post("/WeatherForecast/form")]
+        Task WithFormParam([Body(BodySerializationMethod.UrlEncoded)] SomeQueryModel formParam = null);
     }
 }

@@ -7,6 +7,7 @@
         Body,
         File,
         Header,
-        Other
+        Form,
+        Other,
     }
 }
