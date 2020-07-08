@@ -7,11 +7,10 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dotnet-generate-client</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <RepositoryUrl>https://github.com/Dreamescaper/GenerateAspNetCoreClient</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageId>GenerateAspNetCoreClient.Refit</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>DotNet tool to generate Refit HTTP client types from ASP.NET Core API controllers.</Description>
   </PropertyGroup>
 
