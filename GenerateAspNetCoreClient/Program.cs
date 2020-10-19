@@ -1,10 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using CommandLine;
+﻿using CommandLine;
 using DotNet.Cli.Build;
 using GenerateAspNetCoreClient.Command;
 using GenerateAspNetCoreClient.Options;
+using System;
+using System.IO;
+using System.Linq;
+using System.Runtime.Loader;
 
 namespace GenerateAspNetCoreClient
 {
@@ -23,7 +24,9 @@ namespace GenerateAspNetCoreClient
             var directory = Path.GetDirectoryName(assemblyPath);
 
             var sharedOptionsAssembly = typeof(GenerateClientOptions).Assembly;
+
             var context = new CustomLoadContext(assemblyPath, sharedOptionsAssembly);
+            AssemblyLoadContext.Default.Resolving += (_, name) => context.LoadFromAssemblyName(name);
 
             var webProjectAssembly = context.LoadFromAssemblyPath(assemblyPath);
             var commandAssembly = context.LoadFromAssemblyPath(typeof(GenerateClientCommand).Assembly.Location);
