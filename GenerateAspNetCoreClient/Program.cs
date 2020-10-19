@@ -26,7 +26,7 @@ namespace GenerateAspNetCoreClient
             var sharedOptionsAssembly = typeof(GenerateClientOptions).Assembly;
 
             var context = new CustomLoadContext(assemblyPath, sharedOptionsAssembly);
-            AssemblyLoadContext.Default.Resolving += (_, name) => context.LoadFromAssemblyName(name);
+            AssemblyLoadContext.Default.Resolving += (_, name) => context.Load(name, false);
 
             var webProjectAssembly = context.LoadFromAssemblyPath(assemblyPath);
             var commandAssembly = context.LoadFromAssemblyPath(typeof(GenerateClientCommand).Assembly.Location);

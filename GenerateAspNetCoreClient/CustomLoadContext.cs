@@ -15,14 +15,14 @@ namespace GenerateAspNetCoreClient
             sharedAssemply = sharedAssembly;
         }
 
-        protected override Assembly Load(AssemblyName assemblyName)
+        public Assembly Load(AssemblyName assemblyName, bool fallbackToDefault)
         {
             if (assemblyName.FullName == sharedAssemply.FullName)
                 return sharedAssemply;
 
             var path = dependencyResolver.ResolveAssemblyToPath(assemblyName);
 
-            if (path == null)
+            if (path == null && fallbackToDefault)
             {
                 var defaultLoaded = AssemblyLoadContext.Default.LoadFromAssemblyName(assemblyName);
 
@@ -31,6 +31,11 @@ namespace GenerateAspNetCoreClient
             }
 
             return path != null ? LoadFromAssemblyPath(path) : null;
+        }
+
+        protected override Assembly Load(AssemblyName assemblyName)
+        {
+            return Load(assemblyName, true);
         }
 
         protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
