@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="refit" Version="5.1.67" />
+    <PackageReference Include="refit" Version="5.2.1" />
   </ItemGroup>
 
   <ItemGroup>
