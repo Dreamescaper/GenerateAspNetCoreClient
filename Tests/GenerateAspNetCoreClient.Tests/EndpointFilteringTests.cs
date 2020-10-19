@@ -112,18 +112,17 @@ namespace GenerateAspNetCoreClient.Tests
 
     #region Test Classes
 
-    class FilterNameType { }
-
-    class OtherNameType { }
+    internal class FilterNameType { }
+    internal class OtherNameType { }
 
     namespace FilterNameNamespace
     {
-        class SomeType1 { }
+        internal class SomeType1 { }
     }
 
     namespace OtherNameNamespace
     {
-        class SomeType2 { }
+        internal class SomeType2 { }
     }
 
     #endregion
