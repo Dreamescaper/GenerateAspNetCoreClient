@@ -9,6 +9,7 @@ using GenerateAspNetCoreClient.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace GenerateAspNetCoreClient.Command
 {
@@ -45,6 +46,7 @@ namespace GenerateAspNetCoreClient.Command
             if (hostBuilderMethod != null)
             {
                 var hostBuilder = hostBuilderMethod.Invoke(null, new[] { Array.Empty<string>() }) as IHostBuilder;
+                hostBuilder?.ConfigureLogging(c => c.ClearProviders());
                 var host = hostBuilder?.Build();
                 services = host?.Services;
             }
@@ -53,6 +55,7 @@ namespace GenerateAspNetCoreClient.Command
             if (webHostBuilderMethod != null)
             {
                 var webHostBuilder = webHostBuilderMethod.Invoke(null, new[] { Array.Empty<string>() }) as IWebHostBuilder;
+                webHostBuilder?.ConfigureLogging(c => c.ClearProviders());
                 var webHost = webHostBuilder?.Build();
                 services = webHost?.Services;
             }
