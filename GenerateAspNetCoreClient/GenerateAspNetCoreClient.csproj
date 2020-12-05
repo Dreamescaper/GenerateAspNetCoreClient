@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dotnet-generate-client</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <Version>0.1</Version>
+    <Version>0.2</Version>
     <RepositoryUrl>https://github.com/Dreamescaper/GenerateAspNetCoreClient</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageId>GenerateAspNetCoreClient.Refit</PackageId>
