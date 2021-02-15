@@ -32,7 +32,7 @@ namespace GenerateAspNetCoreClient.Tests
                 Namespace = "Test.Name.Space",
             };
 
-            GenerateAspNetCoreClient.Program.CreateClient(options);
+            Program.CreateClient(options);
 
             Assert.That(() => Project.FromPath(_outProjectPath).Build(), Throws.Nothing);
             AssertSnapshotMatch("netcoreapp3.1");

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using GenerateAspNetCoreClient.Command;
 using GenerateAspNetCoreClient.Command.Model;
@@ -16,7 +17,7 @@ namespace GenerateAspNetCoreClient.Tests
             var options = new GenerateClientOptions { AddCancellationTokenParameters = true };
             var existingParameter = ApiDescriptionTestData.CreateParameter();
             var apiExplorer = ApiDescriptionTestData.CreateApiExplorer(apiParameters: new[] { existingParameter });
-            var builder = new ClientModelBuilder(apiExplorer, options, new string[] { });
+            var builder = new ClientModelBuilder(apiExplorer, options, Array.Empty<string>());
 
             // Act
             var client = builder.GetClientCollection().Clients[0];

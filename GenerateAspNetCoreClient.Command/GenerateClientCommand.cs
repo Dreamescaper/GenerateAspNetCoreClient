@@ -8,6 +8,7 @@ using GenerateAspNetCoreClient.Command.Model;
 using GenerateAspNetCoreClient.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -65,7 +66,7 @@ namespace GenerateAspNetCoreClient.Command
                 throw new Exception("Entry class should have either 'CreateHostBuilder', or 'CreateWebHostBuilder' method");
             }
 
-            var apiExplorerProvider = (IApiDescriptionGroupCollectionProvider)services.GetService(typeof(IApiDescriptionGroupCollectionProvider));
+            var apiExplorerProvider = services.GetRequiredService<IApiDescriptionGroupCollectionProvider>();
 
             return apiExplorerProvider.ApiDescriptionGroups;
         }

@@ -133,7 +133,7 @@ namespace GenerateAspNetCoreClient.Command
             return new EndpointMethod
             (
                 xmlDoc: GetXmlDoc(apiDescription),
-                httpMethod: new HttpMethod(apiDescription.HttpMethod),
+                httpMethod: new HttpMethod(apiDescription.HttpMethod ?? HttpMethod.Get.Method),
                 path: apiDescription.RelativePath,
                 responseType: responseType,
                 name: ((ControllerActionDescriptor)apiDescription.ActionDescriptor).ActionName,
