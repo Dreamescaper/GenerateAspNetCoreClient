@@ -93,6 +93,7 @@ namespace GenerateAspNetCoreClient.Command
                             ParameterSource.Body => "[Body] ",
                             ParameterSource.Form => "[Body(BodySerializationMethod.UrlEncoded)] ",
                             ParameterSource.Header => $"[Header(\"{p.Name}\")] ",
+                            ParameterSource.Query when p.Type != typeof(string) && !p.Type.IsValueType => "[Query] ",
                             _ => ""
                         };
 

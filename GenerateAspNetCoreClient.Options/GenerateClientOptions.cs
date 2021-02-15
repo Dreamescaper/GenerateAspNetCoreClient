@@ -25,6 +25,9 @@ namespace GenerateAspNetCoreClient.Options
         [Option("add-cancellation-token", Required = false, Default = false, HelpText = "Add CancellationToken parameters to all endpoints.")]
         public bool AddCancellationTokenParameters { get; set; }
 
+        [Option("use-query-models", Required = false, Default = false, HelpText = "Use query container type parameter (as defined in the endpoint) instead of separate parameters.")]
+        public bool UseQueryModels { get; set; }
+
         [Option("exclude-types", Required = false, HelpText = "Exclude all controller types with substring in full name (including namespace).")]
         public string? ExcludeTypes { get; set; }
 

@@ -10,6 +10,7 @@ using GenerateAspNetCoreClient.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Namotion.Reflection;
 
 namespace GenerateAspNetCoreClient.Command
@@ -152,6 +153,7 @@ namespace GenerateAspNetCoreClient.Command
                 if (parameterDescription.ParameterDescriptor?.ParameterType == typeof(CancellationToken))
                     continue;
 
+                // IFormFile
                 if (parameterDescription.ParameterDescriptor?.ParameterType == typeof(IFormFile))
                 {
                     var name = parameterDescription.ParameterDescriptor.Name;
@@ -166,6 +168,55 @@ namespace GenerateAspNetCoreClient.Command
                     // Skip parameters that correspond to same file
                     while (i + 1 < apiDescription.ParameterDescriptions.Count
                         && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.ParameterType == typeof(IFormFile)
+                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
+                    {
+                        i++;
+                    }
+
+                    continue;
+                }
+
+                // Form
+                // API explorer shows form as separate parameters. We want to have single model parameter.
+                if (parameterDescription.Source == BindingSource.Form)
+                {
+                    var name = parameterDescription.ParameterDescriptor?.Name ?? "form";
+                    var formType = parameterDescription.ParameterDescriptor?.ParameterType ?? typeof(object);
+
+                    parametersList.Add(new Parameter(
+                        source: ParameterSource.Form,
+                        type: formType,
+                        name: parameterDescription.Name,
+                        parameterName: name.ToCamelCase(),
+                        defaultValueLiteral: "null"));
+
+                    // Skip parameters that correspond to same form
+                    while (i + 1 < apiDescription.ParameterDescriptions.Count
+                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.ParameterType == formType
+                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
+                    {
+                        i++;
+                    }
+                }
+
+                if (options.UseQueryModels
+                    && parameterDescription.Source == BindingSource.Query
+                    && parameterDescription.ModelMetadata?.ContainerType != null
+                    && parameterDescription.ParameterDescriptor != null)
+                {
+                    var name = parameterDescription.ParameterDescriptor.Name;
+                    var containerType = parameterDescription.ModelMetadata.ContainerType;
+
+                    parametersList.Add(new Parameter(
+                        source: ParameterSource.Query,
+                        type: containerType,
+                        name: parameterDescription.Name,
+                        parameterName: name.ToCamelCase(),
+                        defaultValueLiteral: "null"));
+
+                    // Skip parameters that correspond to same query model
+                    while (i + 1 < apiDescription.ParameterDescriptions.Count
+                        && apiDescription.ParameterDescriptions[i + 1].ModelMetadata?.ContainerType == containerType
                         && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
                     {
                         i++;
@@ -201,20 +252,6 @@ namespace GenerateAspNetCoreClient.Command
                     : (parameterDescription.ParameterDescriptor?.Name ?? parameterDescription.Name).ToCamelCase();
 
                 var type = parameterDescription.Type ?? typeof(string);
-
-                // API explorer shows form as separate parameters. We want to have single model parameter.
-                if (source == ParameterSource.Form)
-                {
-                    type = parameterDescription.ParameterDescriptor?.ParameterType ?? typeof(object);
-
-                    // Skip parameters that correspond to same form
-                    while (i + 1 < apiDescription.ParameterDescriptions.Count
-                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.ParameterType == type
-                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == parameterName)
-                    {
-                        i++;
-                    }
-                }
 
                 var defaultValue = GetDefaultValueLiteral(parameterDescription, type);
 
@@ -302,7 +339,7 @@ namespace GenerateAspNetCoreClient.Command
             return namespaces.GetCommonPart(".");
         }
 
-        private static List<string> GetNamespaces(IEnumerable<ApiDescription> apiDescriptions, HashSet<Type>? ambiguousTypes = null)
+        private List<string> GetNamespaces(IEnumerable<ApiDescription> apiDescriptions, HashSet<Type>? ambiguousTypes = null)
         {
             var namespaces = new HashSet<string>();
 
@@ -321,6 +358,9 @@ namespace GenerateAspNetCoreClient.Command
                             break;
                         case "Form":
                             AddForType(parameterDescription.ParameterDescriptor.ParameterType);
+                            break;
+                        case "Query" when options.UseQueryModels && parameterDescription.ModelMetadata?.ContainerType != null:
+                            AddForType(parameterDescription.ModelMetadata.ContainerType);
                             break;
                         default:
                             AddForType(parameterDescription.Type);
