@@ -35,10 +35,13 @@ namespace GenerateAspNetCoreClient.Tests
             Program.CreateClient(options);
 
             Assert.That(() => Project.FromPath(_outProjectPath).Build(), Throws.Nothing);
+
+            // Uncomment when needed to regenerate snapshots.
+            // RegenerateSnapshots("netcoreapp3.1");
             AssertSnapshotMatch("netcoreapp3.1");
         }
 
-        private void RegenerateSnapshots(string name)
+        private static void RegenerateSnapshots(string name)
         {
             var setPath = Path.Combine(_snapshotsPath, name);
 
@@ -58,7 +61,7 @@ namespace GenerateAspNetCoreClient.Tests
             }
         }
 
-        private void AssertSnapshotMatch(string name)
+        private static void AssertSnapshotMatch(string name)
         {
             var setPath = Path.Combine(_snapshotsPath, name);
 

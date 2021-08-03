@@ -93,7 +93,7 @@ namespace GenerateAspNetCoreClient.Command
                             ParameterSource.Body => "[Body] ",
                             ParameterSource.Form => "[Body(BodySerializationMethod.UrlEncoded)] ",
                             ParameterSource.Header => $"[Header(\"{p.Name}\")] ",
-                            ParameterSource.Query when p.Type != typeof(string) && !p.Type.IsValueType => "[Query] ",
+                            ParameterSource.Query => GetQueryAttribute(p),
                             _ => ""
                         };
 
@@ -123,6 +123,17 @@ namespace {clientModel.Namespace}
 {string.Join(Environment.NewLine + Environment.NewLine, methodDescriptions).Indent("        ")}
     }}
 }}";
+        }
+
+        private static string GetQueryAttribute(Parameter parameter)
+        {
+            if (parameter.Type != typeof(string) && !parameter.Type.IsValueType)
+                return "[Query] ";
+
+            if (!string.Equals(parameter.Name, parameter.ParameterName, StringComparison.OrdinalIgnoreCase))
+                return $"[AliasAs(\"{parameter.Name}\")] ";
+
+            return "";
         }
 
         private class RunSettings : IDisposable

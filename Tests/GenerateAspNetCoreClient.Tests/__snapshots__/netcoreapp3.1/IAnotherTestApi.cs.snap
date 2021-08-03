@@ -10,5 +10,8 @@ namespace Test.Name.Space
     {
         [Get("/AnotherTest/with-query-model")]
         Task WithQueryModel(string param1 = null, Guid? param2 = null, int? param3 = null);
+
+        [Get("/AnotherTest/with-query-name")]
+        Task WithQueryParameterName([AliasAs("currency")] string currencyName = null);
     }
 }

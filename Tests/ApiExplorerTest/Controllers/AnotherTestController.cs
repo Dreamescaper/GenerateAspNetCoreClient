@@ -9,9 +9,15 @@ namespace TestWebApi.Controllers
     public class AnotherTestController : ControllerBase
     {
         [HttpGet("with-query-model")]
-        public async Task<ActionResult> WithQueryModel([FromQuery]SomeQueryModel queryModel)
+        public async Task<ActionResult> WithQueryModel([FromQuery] SomeQueryModel queryModel)
         {
             await Task.Delay(1);
+            return Ok();
+        }
+
+        [HttpGet("with-query-name")]
+        public ActionResult WithQueryParameterName([FromQuery(Name = "currency")] string currencyName)
+        {
             return Ok();
         }
     }
