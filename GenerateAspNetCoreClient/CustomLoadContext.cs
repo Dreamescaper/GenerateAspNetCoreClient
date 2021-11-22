@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -10,13 +11,13 @@ namespace GenerateAspNetCoreClient
     internal class CustomLoadContext : AssemblyLoadContext
     {
         private readonly AssemblyDependencyResolver dependencyResolver;
-        private readonly string frameworkPath;
+        private readonly List<string> frameworkPaths;
         private readonly Assembly sharedAssemply;
 
         public CustomLoadContext(string assemblyPath, Assembly sharedAssembly)
         {
             dependencyResolver = new AssemblyDependencyResolver(assemblyPath);
-            frameworkPath = GetFrameworkPath(assemblyPath);
+            frameworkPaths = GetFrameworkPaths(assemblyPath);
             sharedAssemply = sharedAssembly;
         }
 
@@ -44,7 +45,7 @@ namespace GenerateAspNetCoreClient
             if (path != null)
                 return path;
 
-            if (frameworkPath != null)
+            foreach (var frameworkPath in frameworkPaths)
             {
                 var frameworkAssemblyPath = Path.Combine(frameworkPath, assemblyName.Name + ".dll");
 
@@ -69,7 +70,7 @@ namespace GenerateAspNetCoreClient
                 : LoadUnmanagedDllFromPath(resolvedPath);
         }
 
-        private static string GetFrameworkPath(string assemblyPath)
+        private static List<string> GetFrameworkPaths(string assemblyPath)
         {
             // Unfortunately, AssemblyDependencyResolver does not resolve framework references.
             // In case of matching TargetFramework for generator tool and web project we can simply fallback to 
@@ -77,6 +78,8 @@ namespace GenerateAspNetCoreClient
             // Therefore we attempt to resolve framework assembly path manually - by parsing runtimeconfig.json, and finding
             // framework folder.
             // Any better ideas?...
+
+            var paths = new List<string>();
 
             try
             {
@@ -88,21 +91,33 @@ namespace GenerateAspNetCoreClient
 
                 var runtimeConfig = JsonDocument.Parse(File.ReadAllText(runtimeConfigPath));
 
-                var framework = runtimeConfig.RootElement
-                    .GetProperty("runtimeOptions")
-                    .GetProperty("framework");
+                var runtimeOptionsNode = runtimeConfig.RootElement.GetProperty("runtimeOptions");
 
-                // e.g. name = Microsoft.AspNetCore.App, version = 3.1.0.
-                var name = framework.GetProperty("name").GetString();
-                var version = framework.GetProperty("version").GetString();
+                IEnumerable<JsonElement> frameworkNodes = runtimeOptionsNode.TryGetProperty("frameworks", out var frameworksNode)
+                    ? frameworksNode.EnumerateArray()
+                    : new[] { runtimeOptionsNode.GetProperty("framework") };
 
-                if(name != "Microsoft.AspNetCore.App")
+                foreach (var frameworkNode in frameworkNodes)
                 {
-                    // Do not attempt to resolve Microsoft.NETCore.App references.
-                    // This block is only expected to execute for ASP.Net 2.1 projects (before FrameworkReferences were introduced).
-                    return null;
+                    // e.g. name = Microsoft.AspNetCore.App, version = 3.1.0.
+                    var name = frameworkNode.GetProperty("name").GetString();
+                    var version = frameworkNode.GetProperty("version").GetString();
+                    var path = FindFrameworkVersionPath(name, version);
+
+                    if (path != null)
+                        paths.Add(path);
                 }
 
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to find framework directory: " + e.ToString());
+            }
+
+            return paths;
+
+            static string FindFrameworkVersionPath(string name, string version)
+            {
                 var sharedDirectoryPath =
                     Path.GetDirectoryName(
                         Path.GetDirectoryName(
@@ -118,15 +133,11 @@ namespace GenerateAspNetCoreClient
                     if (versionDirectory != null)
                         return versionDirectory.FullName;
 
-                    version = version.Substring(0, version[0..^1].LastIndexOf('.') + 1);
+                    version = version[..(version[0..^1].LastIndexOf('.') + 1)];
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Failed to find framework directory: " + e.ToString());
-            }
 
-            return null;
+                return null;
+            }
         }
     }
 }

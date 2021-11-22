@@ -442,7 +442,7 @@ namespace GenerateAspNetCoreClient.Command
                 {
                     var suffix = api.RelativePath == commonPathPart
                         ? ""
-                        : api.RelativePath.Substring(commonPathPart.Length + 1).ToPascalCase();
+                        : api.RelativePath[(commonPathPart.Length + 1)..].ToPascalCase();
 
                     ((ControllerActionDescriptor)api.ActionDescriptor).ActionName += suffix;
                 }

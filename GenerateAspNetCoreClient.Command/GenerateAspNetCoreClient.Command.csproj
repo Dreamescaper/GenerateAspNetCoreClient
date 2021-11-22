@@ -2,9 +2,8 @@
   
   <PropertyGroup>
     <RootNamespace>GenerateClientCommand</RootNamespace>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   
   <ItemGroup>
@@ -12,7 +11,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Namotion.Reflection" Version="1.0.18" />
+    <PackageReference Include="Namotion.Reflection" Version="2.0.5" />
   </ItemGroup>
   
   <ItemGroup>
