@@ -37,40 +37,36 @@ namespace GenerateAspNetCoreClient.Tests
             Assert.That(() => Project.FromPath(_outProjectPath).Build(), Throws.Nothing);
 
             // Uncomment when needed to regenerate snapshots.
-            // RegenerateSnapshots("netcoreapp3.1");
-            AssertSnapshotMatch("netcoreapp3.1");
+            // RegenerateSnapshots();
+            AssertSnapshotMatch();
         }
 
-        private static void RegenerateSnapshots(string name)
+        private static void RegenerateSnapshots()
         {
-            var setPath = Path.Combine(_snapshotsPath, name);
-
-            if (Directory.Exists(setPath))
+            if (Directory.Exists(_snapshotsPath))
             {
-                Directory.Delete(setPath, recursive: true);
+                Directory.Delete(_snapshotsPath, recursive: true);
             }
 
-            Directory.CreateDirectory(setPath);
+            Directory.CreateDirectory(_snapshotsPath);
 
             var generatedFiles = Directory.EnumerateFiles(_outPath, "*", new EnumerationOptions { RecurseSubdirectories = true });
 
             foreach (var generatedFile in generatedFiles)
             {
                 var relativePath = Path.GetRelativePath(_outPath, generatedFile);
-                File.Move(generatedFile, Path.Combine(setPath, relativePath + ".snap"));
+                File.Move(generatedFile, Path.Combine(_snapshotsPath, relativePath + ".snap"));
             }
         }
 
-        private static void AssertSnapshotMatch(string name)
+        private static void AssertSnapshotMatch()
         {
-            var setPath = Path.Combine(_snapshotsPath, name);
-
             var generatedFiles = Directory.EnumerateFiles(_outPath, "*", new EnumerationOptions { RecurseSubdirectories = true });
 
             foreach (var generatedFile in generatedFiles)
             {
                 var relativePath = Path.GetRelativePath(_outPath, generatedFile);
-                var snapshotPath = Path.Combine(setPath, relativePath + ".snap");
+                var snapshotPath = Path.Combine(_snapshotsPath, relativePath + ".snap");
 
                 Assert.That(snapshotPath, Does.Exist, $"Unexpected file generated ({relativePath})");
 

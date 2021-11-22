@@ -34,5 +34,8 @@ namespace Test.Name.Space
 
         [Post("/WeatherForecast/form")]
         Task WithFormParam([Body(BodySerializationMethod.UrlEncoded)] SomeQueryModel formParam = null);
+
+        [Get("/WeatherForecast/record")]
+        Task<RecordModel> WithRecordModels(Guid? id = null, string name = null);
     }
 }

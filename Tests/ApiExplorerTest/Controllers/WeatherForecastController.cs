@@ -87,5 +87,12 @@ namespace TestWebApi.Controllers
             await Task.Delay(1);
             return Ok();
         }
+
+        [HttpGet("record")]
+        public async Task<ActionResult<RecordModel>> WithRecordModels([FromQuery] RecordModel record)
+        {
+            await Task.Delay(1);
+            return Ok(record);
+        }
     }
 }
