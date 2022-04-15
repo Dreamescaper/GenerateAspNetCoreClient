@@ -2,7 +2,7 @@
   "profiles": {
     "GenerateAspNetCoreClient": {
       "commandName": "Project",
-      "commandLineArgs": "\"..\\..\\..\\..\\Tests\\ApiExplorerTest\\TestWebApi.csproj\" -o \"..\\..\\..\\..\\Tests\\OutputTest\" -n \"TestClient\""
+      "commandLineArgs": "\"..\\..\\..\\..\\Tests\\TestWebApi.Controllers\\TestWebApi.Controllers.csproj\" -o \"..\\..\\..\\..\\Tests\\OutputTest\" -n \"TestClient\""
     }
   }
 }

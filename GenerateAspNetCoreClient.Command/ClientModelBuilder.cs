@@ -242,6 +242,9 @@ namespace GenerateAspNetCoreClient.Command
                     _ => ParameterSource.Query
                 };
 
+                // Is it possible to have other static values, apart from headers?
+                var isStaticValue = parameterDescription.Source == BindingSource.Header && parameterDescription.BindingInfo is null;
+
                 var isQueryModel = source == ParameterSource.Query
                     && parameterDescription.Type != parameterDescription.ParameterDescriptor?.ParameterType;
 
@@ -250,6 +253,8 @@ namespace GenerateAspNetCoreClient.Command
                 var parameterName = isQueryModel
                     ? parameterDescription.Name.ToCamelCase()
                     : (parameterDescription.ParameterDescriptor?.Name ?? parameterDescription.Name).ToCamelCase();
+
+                parameterName = new string(parameterName.Where(c => char.IsLetterOrDigit(c)).ToArray());
 
                 var type = parameterDescription.Type ?? typeof(string);
 
@@ -265,7 +270,8 @@ namespace GenerateAspNetCoreClient.Command
                     type: type,
                     name: parameterDescription.Name,
                     parameterName: parameterName,
-                    defaultValueLiteral: defaultValue));
+                    defaultValueLiteral: defaultValue,
+                    isStaticValue: isStaticValue));
             }
 
             if (options.AddCancellationTokenParameters)

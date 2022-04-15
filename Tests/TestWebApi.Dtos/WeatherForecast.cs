@@ -1,5 +1,3 @@
-using System;
-
 namespace TestWebApi.Models
 {
     public class WeatherForecast

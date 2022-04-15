@@ -14,13 +14,16 @@ namespace GenerateAspNetCoreClient.Command.Model
 
         public string? DefaultValueLiteral { get; }
 
-        public Parameter(ParameterSource source, Type type, string name, string parameterName, string? defaultValueLiteral)
+        public bool IsConstant { get; }
+
+        public Parameter(ParameterSource source, Type type, string name, string parameterName, string? defaultValueLiteral, bool isStaticValue = false)
         {
             Source = source;
             Type = type;
             Name = name;
             ParameterName = parameterName;
             DefaultValueLiteral = defaultValueLiteral;
+            IsConstant = isStaticValue;
         }
     }
 }

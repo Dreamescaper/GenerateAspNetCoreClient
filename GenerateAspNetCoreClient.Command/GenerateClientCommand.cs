@@ -6,11 +6,8 @@ using System.Reflection;
 using GenerateAspNetCoreClient.Command.Extensions;
 using GenerateAspNetCoreClient.Command.Model;
 using GenerateAspNetCoreClient.Options;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace GenerateAspNetCoreClient.Command
 {
@@ -39,33 +36,7 @@ namespace GenerateAspNetCoreClient.Command
         {
             using var _ = new RunSettings(Path.GetDirectoryName(assembly.Location)!, environment);
 
-            var entryType = assembly.EntryPoint?.DeclaringType;
-            var hostBuilderMethod = entryType?.GetMethod("CreateHostBuilder");
-
-            IServiceProvider? services = null;
-
-            if (hostBuilderMethod != null)
-            {
-                var hostBuilder = hostBuilderMethod.Invoke(null, new[] { Array.Empty<string>() }) as IHostBuilder;
-                hostBuilder?.ConfigureLogging(c => c.ClearProviders());
-                var host = hostBuilder?.Build();
-                services = host?.Services;
-            }
-
-            var webHostBuilderMethod = entryType?.GetMethod("CreateWebHostBuilder");
-            if (webHostBuilderMethod != null)
-            {
-                var webHostBuilder = webHostBuilderMethod.Invoke(null, new[] { Array.Empty<string>() }) as IWebHostBuilder;
-                webHostBuilder?.ConfigureLogging(c => c.ClearProviders());
-                var webHost = webHostBuilder?.Build();
-                services = webHost?.Services;
-            }
-
-            if (services == null)
-            {
-                throw new Exception("Entry class should have either 'CreateHostBuilder', or 'CreateWebHostBuilder' method");
-            }
-
+            var services = ServiceProviderResolver.GetServiceProvider(assembly);
             var apiExplorerProvider = services.GetRequiredService<IApiDescriptionGroupCollectionProvider>();
 
             return apiExplorerProvider.ApiDescriptionGroups;
@@ -73,7 +44,11 @@ namespace GenerateAspNetCoreClient.Command
 
         private static string CreateClient(Client clientModel, HashSet<Type> ambiguousTypes)
         {
-            var methodDescriptions = clientModel.EndpointMethods.Select(endpointMethod =>
+            IEnumerable<EndpointMethod> endpointMethods = clientModel.EndpointMethods;
+            endpointMethods = HandleEndpointDuplicates(endpointMethods, ambiguousTypes);
+            endpointMethods = HandleSignatureDuplicates(endpointMethods, ambiguousTypes);
+
+            var methodDescriptions = endpointMethods.Select(endpointMethod =>
             {
                 var xmlDoc = endpointMethod.XmlDoc;
 
@@ -84,7 +59,13 @@ namespace GenerateAspNetCoreClient.Command
                     ? "[Multipart]" + Environment.NewLine
                     : "";
 
+                var staticHeaders = endpointMethod.Parameters.Where(p => p.Source == ParameterSource.Header && p.IsConstant).ToArray();
+                var staticHeadersAttribute = staticHeaders.Length > 0
+                    ? $"[Headers({string.Join(", ", staticHeaders.Select(h => $"\"{h.Name}: {h.DefaultValueLiteral!.Trim('"')}\""))})]" + Environment.NewLine
+                    : "";
+
                 var parameterStrings = endpointMethod.Parameters
+                    .Except(staticHeaders)
                     .OrderBy(p => p.DefaultValueLiteral != null)
                     .Select(p =>
                     {
@@ -107,7 +88,7 @@ namespace GenerateAspNetCoreClient.Command
                 var methodPathAttribute = $@"[{httpMethodAttribute}(""/{endpointMethod.Path}"")]";
 
                 return
-    $@"{xmlDoc}{multipartAttribute}{methodPathAttribute}
+    $@"{xmlDoc}{multipartAttribute}{staticHeadersAttribute}{methodPathAttribute}
 {endpointMethod.ResponseType.WrapInTask().GetName(ambiguousTypes)} {endpointMethod.Name}({string.Join(", ", parameterStrings)});";
             }).ToArray();
 
@@ -123,6 +104,42 @@ namespace {clientModel.Namespace}
 {string.Join(Environment.NewLine + Environment.NewLine, methodDescriptions).Indent("        ")}
     }}
 }}";
+        }
+
+        private static IEnumerable<EndpointMethod> HandleSignatureDuplicates(IEnumerable<EndpointMethod> endpointMethods, HashSet<Type> ambiguousTypes)
+        {
+            var dictionary = new Dictionary<string, EndpointMethod>();
+
+            foreach (var endpointMethod in endpointMethods)
+            {
+                var parameterTypes = endpointMethod.Parameters.Where(p => !p.IsConstant).Select(p => p.Type.GetName(ambiguousTypes));
+                var signatureDescription = $"{endpointMethod.Name}({string.Join(",", parameterTypes)})";
+
+                if (dictionary.ContainsKey(signatureDescription))
+                    Console.WriteLine("Duplicate API method " + signatureDescription);
+
+                dictionary[signatureDescription] = endpointMethod;
+            }
+
+            return dictionary.Values;
+        }
+
+        private static IEnumerable<EndpointMethod> HandleEndpointDuplicates(IEnumerable<EndpointMethod> endpointMethods, HashSet<Type> ambiguousTypes)
+        {
+            var dictionary = new Dictionary<string, EndpointMethod>();
+
+            foreach (var endpointMethod in endpointMethods)
+            {
+                var parameterDescriptions = endpointMethod.Parameters.Select(p => $"{p.Source} {p.Type.GetName(ambiguousTypes)} {p.Name} {(p.IsConstant ? ": " + p.DefaultValueLiteral : "")}");
+                var endpointDescription = $"{endpointMethod.HttpMethod} {endpointMethod.Path} ({string.Join(", ", parameterDescriptions)})";
+
+                if (dictionary.ContainsKey(endpointDescription))
+                    Console.WriteLine("Duplicate API endpoint " + endpointDescription);
+
+                dictionary[endpointDescription] = endpointMethod;
+            }
+
+            return dictionary.Values;
         }
 
         private static string GetQueryAttribute(Parameter parameter)

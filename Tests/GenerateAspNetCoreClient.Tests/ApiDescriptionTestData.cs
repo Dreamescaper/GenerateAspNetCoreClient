@@ -56,7 +56,7 @@ namespace GenerateAspNetCoreClient.Tests
                     new ApiResponseType
                     {
                         StatusCode = 200,
-                        Type = responseType ?? typeof(WeatherForecast)
+                        Type = responseType ?? typeof(WeatherForecastRecord)
                     }
                 }
             };

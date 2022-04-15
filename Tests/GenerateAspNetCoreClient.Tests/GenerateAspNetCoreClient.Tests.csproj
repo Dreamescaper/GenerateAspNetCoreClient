@@ -16,7 +16,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\GenerateAspNetCoreClient\GenerateAspNetCoreClient.csproj" />
-    <ProjectReference Include="..\ApiExplorerTest\TestWebApi.csproj" />
+    <ProjectReference Include="..\TestWebApi.Controllers\TestWebApi.Controllers.csproj" />
+    <ProjectReference Include="..\TestWebApi.MinimalApi\TestWebApi.MinimalApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="__snapshots__\" />
   </ItemGroup>
 
 </Project>

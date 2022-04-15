@@ -10,9 +10,9 @@ namespace GenerateAspNetCoreClient.Tests
 {
     public class ClientGenerationTests
     {
-        private static readonly string _snapshotsPath = Path.Combine("..", "..", "..", "__snapshots__");
+        private static readonly string _snapshotsPath = Path.Combine("..", "..", "..", "__snapshots__", "{0}");
 
-        private static readonly string _inputPath = Path.Combine("..", "..", "..", "..", "ApiExplorerTest", "TestWebApi.csproj");
+        private static readonly string _inputPath = Path.Combine("..", "..", "..", "..", "{0}", "{0}.csproj");
         private static readonly string _outPath = Path.Combine("..", "..", "..", "..", "OutputTest", "Client");
         private static readonly string _outProjectPath = Path.Combine("..", "..", "..", "..", "OutputTest", "OutputProject.csproj");
 
@@ -22,12 +22,13 @@ namespace GenerateAspNetCoreClient.Tests
             Directory.Delete(_outPath, true);
         }
 
-        [Test]
-        public void GenerationTest()
+        [TestCase("TestWebApi.Controllers")]
+        [TestCase("TestWebApi.Versioning")]
+        public void GenerationTest(string testProjectName)
         {
             var options = new GenerateClientOptions
             {
-                InputPath = _inputPath,
+                InputPath = string.Format(_inputPath, testProjectName),
                 OutPath = _outPath,
                 Namespace = "Test.Name.Space",
             };
@@ -37,36 +38,39 @@ namespace GenerateAspNetCoreClient.Tests
             Assert.That(() => Project.FromPath(_outProjectPath).Build(), Throws.Nothing);
 
             // Uncomment when needed to regenerate snapshots.
-            // RegenerateSnapshots();
-            AssertSnapshotMatch();
+            RegenerateSnapshots(testProjectName);
+            AssertSnapshotMatch(testProjectName);
         }
 
-        private static void RegenerateSnapshots()
+        private static void RegenerateSnapshots(string testProjectName)
         {
-            if (Directory.Exists(_snapshotsPath))
+            var snapshotsPath = string.Format(_snapshotsPath, testProjectName);
+
+            if (Directory.Exists(snapshotsPath))
             {
-                Directory.Delete(_snapshotsPath, recursive: true);
+                Directory.Delete(snapshotsPath, recursive: true);
             }
 
-            Directory.CreateDirectory(_snapshotsPath);
+            Directory.CreateDirectory(snapshotsPath);
 
             var generatedFiles = Directory.EnumerateFiles(_outPath, "*", new EnumerationOptions { RecurseSubdirectories = true });
 
             foreach (var generatedFile in generatedFiles)
             {
                 var relativePath = Path.GetRelativePath(_outPath, generatedFile);
-                File.Move(generatedFile, Path.Combine(_snapshotsPath, relativePath + ".snap"));
+                File.Move(generatedFile, Path.Combine(snapshotsPath, relativePath + ".snap"));
             }
         }
 
-        private static void AssertSnapshotMatch()
+        private static void AssertSnapshotMatch(string testProjectName)
         {
+            var snapshotsPath = string.Format(_snapshotsPath, testProjectName);
             var generatedFiles = Directory.EnumerateFiles(_outPath, "*", new EnumerationOptions { RecurseSubdirectories = true });
 
             foreach (var generatedFile in generatedFiles)
             {
                 var relativePath = Path.GetRelativePath(_outPath, generatedFile);
-                var snapshotPath = Path.Combine(_snapshotsPath, relativePath + ".snap");
+                var snapshotPath = Path.Combine(snapshotsPath, relativePath + ".snap");
 
                 Assert.That(snapshotPath, Does.Exist, $"Unexpected file generated ({relativePath})");
 
