@@ -1,4 +1,4 @@
-﻿// Originally from https://raw.githubusercontent.com/bsurprised/NSwag/master/src/NSwag.Commands/HostFactoryResolver.cs.
+﻿// Originally from https://github.com/RicoSuter/NSwag/blob/master/src/NSwag.Commands/HostFactoryResolver.cs.
 
 #nullable disable
 
