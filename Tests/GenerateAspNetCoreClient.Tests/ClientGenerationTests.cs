@@ -38,7 +38,7 @@ namespace GenerateAspNetCoreClient.Tests
             Assert.That(() => Project.FromPath(_outProjectPath).Build(), Throws.Nothing);
 
             // Uncomment when needed to regenerate snapshots.
-            RegenerateSnapshots(testProjectName);
+            // RegenerateSnapshots(testProjectName);
             AssertSnapshotMatch(testProjectName);
         }
 

@@ -91,6 +91,13 @@ namespace GenerateAspNetCoreClient.Command.Extensions
             return typeof(Task<>).MakeGenericType(@this);
         }
 
+        public static Type UnwrapTask(this Type @this)
+        {
+            return @this.IsGenericType && @this.GetGenericTypeDefinition() == typeof(Task<>) 
+                ? @this.GetGenericArguments()[0] 
+                : @this;
+        }
+
         public static Type ToNullable(this Type @this)
         {
             if (!@this.IsValueType)

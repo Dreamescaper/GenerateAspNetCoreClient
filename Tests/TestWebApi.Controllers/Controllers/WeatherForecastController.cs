@@ -62,6 +62,13 @@ namespace TestWebApi.Controllers
             return null;
         }
 
+        [HttpGet("download")]
+        public Task<FileContentResult> Download()
+        {
+            var bb = new byte[1];
+            return Task.FromResult(File(bb, "application/pdf", "weather.pdf"));
+        }
+
         [HttpPost("search")]
         public Task<WeatherForecast> Search(string name = "test")
         {

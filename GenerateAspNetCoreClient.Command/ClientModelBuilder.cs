@@ -8,6 +8,7 @@ using GenerateAspNetCoreClient.Command.Extensions;
 using GenerateAspNetCoreClient.Command.Model;
 using GenerateAspNetCoreClient.Options;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -330,10 +331,24 @@ namespace GenerateAspNetCoreClient.Command
 
         private static Type? GetResponseType(ApiDescription apiDescription)
         {
-            return apiDescription.SupportedResponseTypes
+            var responseType = apiDescription.SupportedResponseTypes
                 .OrderBy(r => r.StatusCode)
                 .FirstOrDefault(r => r.StatusCode >= 200 && r.StatusCode < 300)
                 ?.Type;
+
+            if (responseType is null)
+            {
+                // Workaround for bug https://github.com/dotnet/aspnetcore/issues/30465
+                var methodInfo = (apiDescription.ActionDescriptor as ControllerActionDescriptor)?.MethodInfo;
+                var methodResponseType = methodInfo?.ReturnType?.UnwrapTask();
+
+                if (methodResponseType?.IsAssignableTo(typeof(FileResult)) == true)
+                {
+                    responseType = typeof(Stream);
+                }
+            }
+
+            return responseType;
         }
 
         private static string GetCommonNamespacesPart(IEnumerable<IGrouping<ControllerInfo, ApiDescription>> controllerApiDescriptions)
