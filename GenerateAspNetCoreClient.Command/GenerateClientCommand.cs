@@ -24,7 +24,7 @@ namespace GenerateAspNetCoreClient.Command
 
             foreach (var clientModel in clientCollection)
             {
-                var clientText = CreateClient(clientModel, clientCollection.AmbiguousTypes);
+                var clientText = CreateClient(clientModel, clientCollection.AmbiguousTypes, options);
 
                 var path = Path.Combine(options.OutPath, clientModel.Location);
                 Directory.CreateDirectory(path);
@@ -43,7 +43,7 @@ namespace GenerateAspNetCoreClient.Command
             return apiExplorerProvider.ApiDescriptionGroups;
         }
 
-        private static string CreateClient(Client clientModel, HashSet<Type> ambiguousTypes)
+        private static string CreateClient(Client clientModel, HashSet<Type> ambiguousTypes, GenerateClientOptions options)
         {
             IEnumerable<EndpointMethod> endpointMethods = clientModel.EndpointMethods;
             endpointMethods = HandleEndpointDuplicates(endpointMethods, ambiguousTypes);
@@ -88,9 +88,11 @@ namespace GenerateAspNetCoreClient.Command
                 var httpMethodAttribute = endpointMethod.HttpMethod.ToString().ToPascalCase();
                 var methodPathAttribute = $@"[{httpMethodAttribute}(""/{endpointMethod.Path}"")]";
 
+                var responseTypeName = GetResponseTypeName(endpointMethod.ResponseType, ambiguousTypes, options);
+
                 return
     $@"{xmlDoc}{multipartAttribute}{staticHeadersAttribute}{methodPathAttribute}
-{endpointMethod.ResponseType.WrapInTask().GetName(ambiguousTypes)} {endpointMethod.Name}({string.Join(", ", parameterStrings)});";
+{responseTypeName} {endpointMethod.Name}({string.Join(", ", parameterStrings)});";
             }).ToArray();
 
             return
@@ -105,6 +107,20 @@ namespace {clientModel.Namespace}
 {string.Join(Environment.NewLine + Environment.NewLine, methodDescriptions).Indent("        ")}
     }}
 }}";
+        }
+
+        private static string GetResponseTypeName(Type responseType, HashSet<Type> ambiguousTypes, GenerateClientOptions options)
+        {
+            if (options.UseApiResponses)
+            {
+                return responseType == typeof(void)
+                    ? "Task<IApiResponse>"
+                    : $"Task<IApiResponse<{responseType.GetName(ambiguousTypes)}>>";
+            }
+            else
+            {
+                return responseType.WrapInTask().GetName(ambiguousTypes);
+            }
         }
 
         private static IEnumerable<EndpointMethod> HandleSignatureDuplicates(IEnumerable<EndpointMethod> endpointMethods, HashSet<Type> ambiguousTypes)

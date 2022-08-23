@@ -28,6 +28,9 @@ namespace GenerateAspNetCoreClient.Options
         [Option("use-query-models", Required = false, Default = false, HelpText = "Use query container type parameter (as defined in the endpoint) instead of separate parameters.")]
         public bool UseQueryModels { get; set; }
 
+        [Option("use-api-responses", Required = false, Default = false, HelpText = "Use Task<IApiResponse<T>> return types for endpoints.")]
+        public bool UseApiResponses { get; set; }
+
         [Option("exclude-types", Required = false, HelpText = "Exclude all controller types with substring in full name (including namespace).")]
         public string? ExcludeTypes { get; set; }
 
