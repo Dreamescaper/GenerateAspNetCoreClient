@@ -20,5 +20,11 @@ namespace TestWebApi.Controllers
         {
             return Ok();
         }
+
+        [HttpGet("with-query-name-array")]
+        public ActionResult WithQueryArrayParameterName([FromQuery(Name = "currencies")] string[] currencyNames)
+        {
+            return Ok();
+        }
     }
 }

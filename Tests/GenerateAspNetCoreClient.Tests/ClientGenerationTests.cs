@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using DotNet.Cli.Build;
 using GenerateAspNetCoreClient.Options;
@@ -60,6 +61,8 @@ namespace GenerateAspNetCoreClient.Tests
                 var relativePath = Path.GetRelativePath(_outPath, generatedFile);
                 File.Move(generatedFile, Path.Combine(snapshotsPath, relativePath + ".snap"));
             }
+
+            throw new Exception("Don't forget to comment snapshot generation.");
         }
 
         private static void AssertSnapshotMatch(string testProjectName)

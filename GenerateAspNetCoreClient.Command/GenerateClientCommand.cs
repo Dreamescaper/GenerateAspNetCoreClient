@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -144,7 +145,11 @@ namespace {clientModel.Namespace}
 
         private static string GetQueryAttribute(Parameter parameter)
         {
-            if (parameter.Type != typeof(string) && !parameter.Type.IsValueType)
+            bool isKeyValuePairs = parameter.Type != typeof(string)
+                && !parameter.Type.IsAssignableTo(typeof(IDictionary))
+                && parameter.Type.IsAssignableTo(typeof(IEnumerable));
+
+            if (parameter.Type != typeof(string) && !parameter.Type.IsValueType && !isKeyValuePairs)
                 return "[Query] ";
 
             if (!string.Equals(parameter.Name, parameter.ParameterName, StringComparison.OrdinalIgnoreCase))

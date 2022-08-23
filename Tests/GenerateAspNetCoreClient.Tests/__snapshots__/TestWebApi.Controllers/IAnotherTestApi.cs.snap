@@ -13,5 +13,8 @@ namespace Test.Name.Space
 
         [Get("/AnotherTest/with-query-name")]
         Task WithQueryParameterName([AliasAs("currency")] string currencyName = null);
+
+        [Get("/AnotherTest/with-query-name-array")]
+        Task WithQueryArrayParameterName([AliasAs("currencies")] string[] currencyNames = null);
     }
 }
