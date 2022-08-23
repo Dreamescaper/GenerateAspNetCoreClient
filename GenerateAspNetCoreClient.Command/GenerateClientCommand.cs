@@ -102,7 +102,7 @@ namespace GenerateAspNetCoreClient.Command
 
 namespace {clientModel.Namespace}
 {{
-    {clientModel.AccessModifier} interface {clientModel.Name}
+    {clientModel.AccessModifier} partial interface {clientModel.Name}
     {{
 {string.Join(Environment.NewLine + Environment.NewLine, methodDescriptions).Indent("        ")}
     }}
