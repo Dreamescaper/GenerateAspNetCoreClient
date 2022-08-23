@@ -60,3 +60,31 @@ namespace Test.Name.Space
     }
 }
 ```
+
+## Parameters
+```
+  -o, --out-path              Required. Relative out path for generated files.
+
+  -n, --namespace             Required. Namespace for generated client types.
+
+  --environment               ASPNETCORE_ENVIRONMENT to set during generation.
+
+  --type-name-pattern         (Default: I[controller]Api) Pattern by which client types are named.
+
+  --access-modifier           (Default: public) Access modifier used for generated clients.
+
+  --add-cancellation-token    (Default: false) Add CancellationToken parameters to all endpoints.
+
+  --use-query-models          (Default: false) Use query container type parameter (as defined in the endpoint) instead
+                              of separate parameters.
+
+  --use-api-responses         (Default: false) Use Task<IApiResponse<T>> return types for endpoints.
+
+  --exclude-types             Exclude all controller types with substring in full name (including namespace).
+
+  --exclude-paths             Exclude all endpoints with substring in relative path.
+
+  --include-types             Include only controller types with substring in full name (including namespace).
+
+  --include-paths             Include only endpoints with substring in relative path.
+```
