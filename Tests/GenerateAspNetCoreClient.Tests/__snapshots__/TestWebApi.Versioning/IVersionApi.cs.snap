@@ -5,7 +5,7 @@ using Refit;
 
 namespace Test.Name.Space
 {
-    public interface IVersionApi
+    public partial interface IVersionApi
     {
         [Headers("Api-Version: 2.0")]
         [Get("/api/Version")]

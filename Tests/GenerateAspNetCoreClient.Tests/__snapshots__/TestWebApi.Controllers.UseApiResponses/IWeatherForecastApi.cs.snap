@@ -7,7 +7,7 @@ using TestWebApi.Models;
 
 namespace Test.Name.Space
 {
-    public interface IWeatherForecastApi
+    public partial interface IWeatherForecastApi
     {
         [Get("/WeatherForecast")]
         Task<IApiResponse<IEnumerable<WeatherForecast>>> Get();

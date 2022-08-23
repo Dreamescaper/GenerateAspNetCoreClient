@@ -6,7 +6,7 @@ using Refit;
 
 namespace Test.Name.Space
 {
-    public interface IAnotherTestApi
+    public partial interface IAnotherTestApi
     {
         [Get("/AnotherTest/with-query-model")]
         Task WithQueryModel(string param1 = null, Guid? param2 = null, int? param3 = null);
