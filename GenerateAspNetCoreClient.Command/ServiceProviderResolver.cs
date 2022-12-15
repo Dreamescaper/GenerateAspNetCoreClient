@@ -51,7 +51,6 @@ namespace GenerateAspNetCoreClient.Command
                             null, createWebHostMethod.GetParameters().Length > 0 ? new object[] { args } : Array.Empty<object>());
                         serviceProvider = webHostBuilder.Build().Services;
                     }
-#if NET6_0 || NET5_0 || NETCOREAPP3_1 || NETCOREAPP3_0
                     else
                     {
                         var createHostMethod =
@@ -65,7 +64,6 @@ namespace GenerateAspNetCoreClient.Command
                             serviceProvider = webHostBuilder.Build().Services;
                         }
                     }
-#endif
                 }
             }
 
@@ -88,7 +86,7 @@ namespace GenerateAspNetCoreClient.Command
                 return serviceProvider;
             }
 
-            throw new InvalidOperationException($"NSwag requires the assembly {assembly.GetName()} to have " +
+            throw new InvalidOperationException($"Generator requires the assembly {assembly.GetName()} to have " +
                                                 $"either an BuildWebHost or CreateWebHostBuilder/CreateHostBuilder method. " +
                                                 $"See https://docs.microsoft.com/en-us/aspnet/core/fundamentals/hosting?tabs=aspnetcore2x " +
                                                 $"for suggestions on ways to refactor your startup type.");

@@ -25,7 +25,7 @@ namespace GenerateAspNetCoreClient
         {
             if (assemblyName.FullName == sharedAssemply.FullName)
                 return sharedAssemply;
-            var path = ResolveAssemblyToPath(assemblyName);
+            var path = assemblyName.Name.StartsWith("System.Private") ? null : ResolveAssemblyToPath(assemblyName);
 
             if (path == null && fallbackToDefault)
             {
