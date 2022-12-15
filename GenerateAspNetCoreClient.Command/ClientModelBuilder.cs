@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using GenerateAspNetCoreClient.Command.Extensions;
 using GenerateAspNetCoreClient.Command.Model;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Routing;
 using Namotion.Reflection;
 
 namespace GenerateAspNetCoreClient.Command
@@ -21,22 +23,24 @@ namespace GenerateAspNetCoreClient.Command
         private readonly ApiDescriptionGroupCollection apiExplorer;
         private readonly GenerateClientOptions options;
         private readonly string[] additionalNamespaces;
+        private readonly Assembly webProjectAssembly;
 
         public ClientModelBuilder(
             ApiDescriptionGroupCollection apiExplorer,
             GenerateClientOptions options,
-            string[] additionalNamespaces)
+            string[] additionalNamespaces,
+            Assembly webProjectAssembly)
         {
             this.apiExplorer = apiExplorer;
             this.options = options;
             this.additionalNamespaces = additionalNamespaces;
+            this.webProjectAssembly = webProjectAssembly;
         }
 
         public ClientCollection GetClientCollection()
         {
             var apiDescriptions = apiExplorer.Items
                 .SelectMany(i => i.Items)
-                .Where(i => i.ActionDescriptor is ControllerActionDescriptor)
                 .ToList();
 
             FilterDescriptions(apiDescriptions);
@@ -44,11 +48,12 @@ namespace GenerateAspNetCoreClient.Command
             var allNamespaces = GetNamespaces(apiDescriptions);
             var ambiguousTypes = GetAmbiguousTypes(allNamespaces);
 
-            var controllerApiDescriptions = apiDescriptions.GroupBy(i => ControllerInfo.From((ControllerActionDescriptor)i.ActionDescriptor));
+            var assemblyName = webProjectAssembly.GetName().Name;
+            var apiGroupsDescriptions = apiDescriptions.GroupBy(i => GroupInfo.From(i, assemblyName));
 
-            string commonControllerNamespacePart = GetCommonNamespacesPart(controllerApiDescriptions);
+            string commonControllerNamespacePart = GetCommonNamespacesPart(apiGroupsDescriptions);
 
-            var clients = controllerApiDescriptions.Select(apis =>
+            var clients = apiGroupsDescriptions.Select(apis =>
                 GetClientModel(
                     commonControllerNamespace: commonControllerNamespacePart,
                     additionalNamespaces: additionalNamespaces,
@@ -64,14 +69,14 @@ namespace GenerateAspNetCoreClient.Command
         {
             if (!string.IsNullOrEmpty(options.ExcludeTypes))
             {
-                apiDescriptions.RemoveAll(api
-                    => ((ControllerActionDescriptor)api.ActionDescriptor).ControllerTypeInfo.FullName?.Contains(options.ExcludeTypes) == true);
+                apiDescriptions.RemoveAll(api => api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor
+                    && controllerActionDescriptor.ControllerTypeInfo.FullName?.Contains(options.ExcludeTypes) == true);
             }
 
             if (!string.IsNullOrEmpty(options.IncludeTypes))
             {
-                apiDescriptions.RemoveAll(api
-                    => ((ControllerActionDescriptor)api.ActionDescriptor).ControllerTypeInfo.FullName?.Contains(options.IncludeTypes) != true);
+                apiDescriptions.RemoveAll(api => api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor
+                    && controllerActionDescriptor.ControllerTypeInfo.FullName?.Contains(options.IncludeTypes) != true);
             }
 
             if (!string.IsNullOrEmpty(options.ExcludePaths))
@@ -88,7 +93,7 @@ namespace GenerateAspNetCoreClient.Command
         internal Client GetClientModel(
             string commonControllerNamespace,
             string[] additionalNamespaces,
-            ControllerInfo controllerInfo,
+            GroupInfo controllerInfo,
             List<ApiDescription> apiDescriptions,
             HashSet<Type> ambiguousTypes)
         {
@@ -96,7 +101,11 @@ namespace GenerateAspNetCoreClient.Command
 
             var subPath = GetSubPath(controllerInfo, commonControllerNamespace);
 
-            var name = options.TypeNamePattern.Replace("[controller]", controllerInfo.ControllerName);
+            var groupNamePascalCase = controllerInfo.GroupName.ToPascalCase();
+            var name = options.TypeNamePattern
+                .Replace("[controller]", groupNamePascalCase)
+                .Replace("[group]", groupNamePascalCase);
+
             var clientNamespace = string.Join(".", new[] { options.Namespace }.Concat(subPath));
 
             var namespaces = GetNamespaces(apiDescriptions, ambiguousTypes)
@@ -136,14 +145,26 @@ namespace GenerateAspNetCoreClient.Command
             (
                 xmlDoc: GetXmlDoc(apiDescription),
                 httpMethod: new HttpMethod(apiDescription.HttpMethod ?? HttpMethod.Get.Method),
-                path: apiDescription.RelativePath,
+                path: apiDescription.RelativePath?.TrimEnd('/') ?? "",
                 responseType: responseType,
-                name: ((ControllerActionDescriptor)apiDescription.ActionDescriptor).ActionName,
+                name: GetActionName(apiDescription),
                 parameters: GetParameters(apiDescription)
             );
         }
 
-        internal List<Parameter> GetParameters(ApiDescription apiDescription)
+        private string GetActionName(ApiDescription apiDescription)
+        {
+            if (apiDescription.ActionDescriptor.EndpointMetadata.OfType<RouteNameMetadata>().FirstOrDefault()?.RouteName is string routeName)
+                return routeName;
+
+            if (apiDescription.ActionDescriptor is ControllerActionDescriptor { ActionName: string actionName })
+                return actionName;
+
+            var method = apiDescription.HttpMethod ?? "GET";
+            return (method + " " + apiDescription.RelativePath).ToPascalCase();
+        }
+
+        private List<Parameter> GetParameters(ApiDescription apiDescription)
         {
             var parametersList = new List<Parameter>();
 
@@ -351,11 +372,11 @@ namespace GenerateAspNetCoreClient.Command
             return responseType;
         }
 
-        private static string GetCommonNamespacesPart(IEnumerable<IGrouping<ControllerInfo, ApiDescription>> controllerApiDescriptions)
+        private static string GetCommonNamespacesPart(IEnumerable<IGrouping<GroupInfo, ApiDescription>> controllerApiDescriptions)
         {
             var namespaces = controllerApiDescriptions
                 .Select(c => c.Key)
-                .Select(c => c.ControllerTypeInfo.Namespace ?? "");
+                .Select(c => c.Namespace ?? "");
 
             return namespaces.GetCommonPart(".");
         }
@@ -413,7 +434,7 @@ namespace GenerateAspNetCoreClient.Command
             // Use reflection for AspNetCore 2.1 compatibility.
             var defaultValue = parameter.TryGetPropertyValue<object>(nameof(parameter.DefaultValue));
 
-            if (defaultValue != null)
+            if (defaultValue != null && defaultValue is not DBNull)
             {
                 // If defaultValue is not null - return it.
                 return defaultValue.ToLiteral();
@@ -436,9 +457,9 @@ namespace GenerateAspNetCoreClient.Command
             return null;
         }
 
-        private static string[] GetSubPath(ControllerInfo controllerActionDescriptor, string commonNamespace)
+        private static string[] GetSubPath(GroupInfo controllerActionDescriptor, string commonNamespace)
         {
-            return (controllerActionDescriptor.ControllerTypeInfo.Namespace ?? "")
+            return (controllerActionDescriptor.Namespace ?? "")
                 .Substring(commonNamespace.Length)
                 .Split(".")
                 .Select(nsPart => nsPart.Replace("Controllers", ""))
@@ -449,19 +470,19 @@ namespace GenerateAspNetCoreClient.Command
         private static List<ApiDescription> HandleDuplicates(List<ApiDescription> apiDescriptions)
         {
             var conflictingApisGroups = apiDescriptions
+                .Where(api => api.ActionDescriptor is ControllerActionDescriptor)
                 .GroupBy(api => ((ControllerActionDescriptor)api.ActionDescriptor).ActionName
                     + string.Concat(api.ParameterDescriptions.Select(p => p.Type?.FullName ?? "-")))
-                .Where(g => g.Count() > 1)
-                .ToList();
+                .Where(g => g.Count() > 1);
 
             foreach (var conflictingApis in conflictingApisGroups)
             {
                 // Take suffixes from path
-                var commonPathPart = conflictingApis.Select(api => api.RelativePath).GetCommonPart("/");
+                var commonPathPart = conflictingApis.Select(api => api.RelativePath ?? "").GetCommonPart("/");
 
                 foreach (var api in conflictingApis)
                 {
-                    var suffix = api.RelativePath == commonPathPart
+                    var suffix = api.RelativePath is null || api.RelativePath == commonPathPart
                         ? ""
                         : api.RelativePath[(commonPathPart.Length + 1)..].ToPascalCase();
 

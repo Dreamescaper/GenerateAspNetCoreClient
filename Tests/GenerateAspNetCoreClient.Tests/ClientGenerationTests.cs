@@ -26,6 +26,7 @@ namespace GenerateAspNetCoreClient.Tests
 
         [TestCase("TestWebApi.Controllers")]
         [TestCase("TestWebApi.Versioning")]
+        [TestCase("TestWebApi.MinimalApi")]
         public void GenerationTest(string testProjectName)
         {
             var options = new GenerateClientOptions
@@ -78,7 +79,7 @@ namespace GenerateAspNetCoreClient.Tests
                 File.Move(generatedFile, Path.Combine(snapshotsPath, relativePath + ".snap"));
             }
 
-            throw new Exception("Don't forget to comment snapshot generation.");
+            throw new Exception("Don't forget to disable snapshot regeneration.");
         }
 
         private static void AssertSnapshotMatch(string testProjectName)

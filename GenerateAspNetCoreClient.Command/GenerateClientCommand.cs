@@ -19,7 +19,7 @@ namespace GenerateAspNetCoreClient.Command
             var apiExplorer = GetApiExplorer(assembly, options.Environment);
 
             var clientModelBuilder = new ClientModelBuilder(apiExplorer, options,
-                additionalNamespaces: new[] { "System.Threading.Tasks", "Refit" });
+                additionalNamespaces: new[] { "System.Threading.Tasks", "Refit" }, assembly);
             var clientCollection = clientModelBuilder.GetClientCollection();
 
             foreach (var clientModel in clientCollection)

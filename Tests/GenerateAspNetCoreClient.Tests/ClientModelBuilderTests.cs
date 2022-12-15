@@ -17,7 +17,8 @@ namespace GenerateAspNetCoreClient.Tests
             var options = new GenerateClientOptions { AddCancellationTokenParameters = true };
             var existingParameter = ApiDescriptionTestData.CreateParameter();
             var apiExplorer = ApiDescriptionTestData.CreateApiExplorer(apiParameters: new[] { existingParameter });
-            var builder = new ClientModelBuilder(apiExplorer, options, Array.Empty<string>());
+            var assembly = GetType().Assembly;
+            var builder = new ClientModelBuilder(apiExplorer, options, Array.Empty<string>(), assembly);
 
             // Act
             var client = builder.GetClientCollection().Clients[0];

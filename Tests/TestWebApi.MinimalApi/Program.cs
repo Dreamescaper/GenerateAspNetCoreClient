@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using TestWebApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +15,11 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
-app.MapGet("/weatherforecast", () =>
+var group = app
+    .MapGroup("weather-forecast")
+    .WithGroupName("WeatherForecast");
+
+group.MapGet("/", () =>
 {
     var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecastRecord
@@ -27,7 +32,7 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 });
 
-app.MapGet("/weatherforecast-with-name", () =>
+group.MapGet("with-name", ([FromQuery] int days) =>
 {
     return new WeatherForecastRecord
         (
@@ -37,5 +42,5 @@ app.MapGet("/weatherforecast-with-name", () =>
         );
 }).WithName("GetSomeWeather");
 
-app.MapPost("/weatherforecast", () => Results.Ok());
+app.MapPost("/weather-forecast", (WeatherForecast forecast) => Results.Ok());
 app.Run();
