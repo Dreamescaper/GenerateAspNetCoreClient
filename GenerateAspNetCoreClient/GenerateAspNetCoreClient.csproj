@@ -9,9 +9,10 @@
     <PackageOutputPath>./nupkg</PackageOutputPath>
     <Version>1.1</Version>
     <RepositoryUrl>https://github.com/Dreamescaper/GenerateAspNetCoreClient</RepositoryUrl>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageId>GenerateAspNetCoreClient.Refit</PackageId>
     <Description>DotNet tool to generate Refit HTTP client types from ASP.NET Core API controllers.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +25,10 @@
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
   
