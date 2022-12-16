@@ -1,11 +1,11 @@
-﻿using CommandLine;
-using DotNet.Cli.Build;
-using GenerateAspNetCoreClient.Command;
-using GenerateAspNetCoreClient.Options;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.Loader;
+using CommandLine;
+using DotNet.Cli.Build;
+using GenerateAspNetCoreClient.Command;
+using GenerateAspNetCoreClient.Options;
 
 namespace GenerateAspNetCoreClient
 {
@@ -47,8 +47,8 @@ namespace GenerateAspNetCoreClient
             {
                 // Otherwise - publish the project and return built .dll
                 var project = Project.FromPath(path);
-                project.Publish();
-                return project.PublishFilePath;
+                project.Build();
+                return project.OutputFilePath;
             }
         }
     }
