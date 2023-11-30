@@ -20,6 +20,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD70E8A2-C0E4-463D-9A96-5E466F5ED10E}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -31,7 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApi.Dtos", "Tests\Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApi.Versioning", "Tests\TestWebApi.Versioning\TestWebApi.Versioning.csproj", "{72F457DA-3EDC-4EDA-A15C-CC3FDE507366}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWebApi.Controllers.UseApiResponses", "Tests\TestWebApi.Controllers.UseApiResponses\TestWebApi.Controllers.UseApiResponses.csproj", "{A0FE1063-5602-42DC-ACD7-D17E98483E5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApi.Controllers.UseApiResponses", "Tests\TestWebApi.Controllers.UseApiResponses\TestWebApi.Controllers.UseApiResponses.csproj", "{A0FE1063-5602-42DC-ACD7-D17E98483E5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
