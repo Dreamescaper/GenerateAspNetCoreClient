@@ -73,7 +73,7 @@ namespace GenerateAspNetCoreClient.Command
                         var attribute = p.Source switch
                         {
                             ParameterSource.Body => "[Body] ",
-                            ParameterSource.Form => "[Body(BodySerializationMethod.UrlEncoded)] ",
+                            ParameterSource.Form when !endpointMethod.IsMultipart => "[Body(BodySerializationMethod.UrlEncoded)] ",
                             ParameterSource.Header => $"[Header(\"{p.Name}\")] ",
                             ParameterSource.Query => GetQueryAttribute(p),
                             _ => ""
