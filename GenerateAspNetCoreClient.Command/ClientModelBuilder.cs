@@ -205,19 +205,23 @@ namespace GenerateAspNetCoreClient.Command
                     var name = parameterDescription.ParameterDescriptor?.Name ?? "form";
                     var formType = parameterDescription.ParameterDescriptor?.ParameterType ?? typeof(object);
 
-                    parametersList.Add(new Parameter(
-                        source: ParameterSource.Form,
-                        type: formType,
-                        name: parameterDescription.Name,
-                        parameterName: name.ToCamelCase(),
-                        defaultValueLiteral: "null"));
+                    var sameFormParameters = apiDescription.ParameterDescriptions.Skip(i - 1)
+                        .TakeWhile(d => d.ParameterDescriptor?.ParameterType == formType && d.ParameterDescriptor?.Name == name)
+                        .ToArray();
 
-                    // Skip parameters that correspond to same form
-                    while (i + 1 < apiDescription.ParameterDescriptions.Count
-                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.ParameterType == formType
-                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
+                    // If form model has file parameters - we have to put it as separate parameters.
+                    if (!sameFormParameters.Any(p => p.Source.Id == "FormFile"))
                     {
-                        i++;
+                        parametersList.Add(new Parameter(
+                            source: ParameterSource.Form,
+                            type: formType,
+                            name: parameterDescription.Name,
+                            parameterName: name.ToCamelCase(),
+                            defaultValueLiteral: "null"));
+
+                        i += sameFormParameters.Length - 1;
+
+                        continue;
                     }
                 }
 
@@ -267,7 +271,7 @@ namespace GenerateAspNetCoreClient.Command
                 // Is it possible to have other static values, apart from headers?
                 var isStaticValue = parameterDescription.Source == BindingSource.Header && parameterDescription.BindingInfo is null;
 
-                var isQueryModel = source == ParameterSource.Query
+                var isQueryModel = source is ParameterSource.Query or ParameterSource.Form
                     && parameterDescription.Type != parameterDescription.ParameterDescriptor?.ParameterType;
 
                 // If query model - use parameterDescription.Name, as ParameterDescriptor.Name is name for the whole model,
@@ -399,7 +403,12 @@ namespace GenerateAspNetCoreClient.Command
                             // (not needed for 3.1+)
                             break;
                         case "Form":
-                            AddForType(parameterDescription.ParameterDescriptor.ParameterType);
+                            var hasFile = apiDescription.ParameterDescriptions
+                                .Any(d => d.ParameterDescriptor == parameterDescription.ParameterDescriptor && d.Source.Id == "FormFile");
+
+                            if (!hasFile)
+                                AddForType(parameterDescription.ParameterDescriptor.ParameterType);
+
                             break;
                         case "Query" when options.UseQueryModels && parameterDescription.ModelMetadata?.ContainerType != null:
                             AddForType(parameterDescription.ModelMetadata.ContainerType);
