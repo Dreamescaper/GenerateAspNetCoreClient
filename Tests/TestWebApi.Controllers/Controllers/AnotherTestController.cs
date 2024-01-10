@@ -26,5 +26,11 @@ namespace TestWebApi.Controllers
         {
             return Ok();
         }
+
+        [HttpGet("with-query-enum")]
+        public ActionResult WithQueryEnumParameter([FromQuery] SomeEnum enumParam)
+        {
+            return Ok();
+        }
     }
 }
