@@ -282,7 +282,7 @@ namespace GenerateAspNetCoreClient.Command
 
                 parameterName = new string(parameterName.Where(c => char.IsLetterOrDigit(c)).ToArray());
 
-                var type = parameterDescription.Type ?? typeof(string);
+                var type = parameterDescription.ModelMetadata?.ModelType ?? parameterDescription.Type ?? typeof(string);
 
                 var defaultValue = GetDefaultValueLiteral(parameterDescription, type);
 
@@ -414,7 +414,7 @@ namespace GenerateAspNetCoreClient.Command
                             AddForType(parameterDescription.ModelMetadata.ContainerType);
                             break;
                         default:
-                            AddForType(parameterDescription.Type);
+                            AddForType(parameterDescription.ModelMetadata?.ModelType ?? parameterDescription.Type);
                             break;
                     }
                 }
@@ -440,8 +440,7 @@ namespace GenerateAspNetCoreClient.Command
 
         private static string? GetDefaultValueLiteral(ApiParameterDescription parameter, Type parameterType)
         {
-            // Use reflection for AspNetCore 2.1 compatibility.
-            var defaultValue = parameter.TryGetPropertyValue<object>(nameof(parameter.DefaultValue));
+            var defaultValue = parameter.DefaultValue;
 
             if (defaultValue != null && defaultValue is not DBNull)
             {
@@ -449,7 +448,7 @@ namespace GenerateAspNetCoreClient.Command
                 return defaultValue.ToLiteral();
             }
 
-            var isRequired = parameter.TryGetPropertyValue<bool?>(nameof(parameter.IsRequired)) == true;
+            var isRequired = parameter.IsRequired;
             isRequired |= parameter.ModelMetadata?.IsBindingRequired == true;
 
             if (!parameterType.IsValueType || parameterType.IsNullable())

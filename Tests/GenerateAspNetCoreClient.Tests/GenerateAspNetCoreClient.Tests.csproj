@@ -10,7 +10,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="NUnit" Version="4.0.0" />
+    <PackageReference Include="NUnit" Version="4.0.1" />
     <PackageReference Include="NUnit.Analyzers" Version="3.10.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,10 +25,6 @@
     <ProjectReference Include="..\..\GenerateAspNetCoreClient\GenerateAspNetCoreClient.csproj" />
     <ProjectReference Include="..\TestWebApi.Controllers\TestWebApi.Controllers.csproj" />
     <ProjectReference Include="..\TestWebApi.MinimalApi\TestWebApi.MinimalApi.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="__snapshots__\" />
   </ItemGroup>
 
 </Project>

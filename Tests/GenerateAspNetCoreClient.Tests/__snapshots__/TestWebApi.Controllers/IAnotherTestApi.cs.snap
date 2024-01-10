@@ -3,18 +3,22 @@
 using System;
 using System.Threading.Tasks;
 using Refit;
+using TestWebApi.Models;
 
 namespace Test.Name.Space
 {
     public partial interface IAnotherTestApi
     {
         [Get("/AnotherTest/with-query-model")]
-        Task WithQueryModel(string param1 = null, Guid? param2 = null, int? param3 = null);
+        Task WithQueryModel(string param1 = null, Guid? param2 = null, int? param3 = null, SomeEnum? param4 = null);
 
         [Get("/AnotherTest/with-query-name")]
         Task WithQueryParameterName([AliasAs("currency")] string currencyName = null);
 
         [Get("/AnotherTest/with-query-name-array")]
         Task WithQueryArrayParameterName([AliasAs("currencies")] string[] currencyNames = null);
+
+        [Get("/AnotherTest/with-query-enum")]
+        Task WithQueryEnumParameter(SomeEnum? enumParam = null);
     }
 }
