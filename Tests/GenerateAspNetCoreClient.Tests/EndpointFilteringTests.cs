@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using GenerateAspNetCoreClient.Command;
 using GenerateAspNetCoreClient.Options;
@@ -30,7 +29,7 @@ namespace GenerateAspNetCoreClient.Tests
             var apiExplorer = ApiDescriptionTestData.CreateApiExplorer(apiDescriptions);
 
             // Act
-            var clients = new ClientModelBuilder(apiExplorer, options, Array.Empty<string>(), assembly).GetClientCollection();
+            var clients = new ClientModelBuilder(apiExplorer, options, assembly).GetClientCollection();
 
             // Assert
             Assert.That(clients.Select(c => c.Name), Is.EquivalentTo(new[] { "IOtherNameTypeApi", "ISomeType2Api" }));
@@ -55,7 +54,7 @@ namespace GenerateAspNetCoreClient.Tests
             var apiExplorer = ApiDescriptionTestData.CreateApiExplorer(apiDescriptions);
 
             // Act
-            var clients = new ClientModelBuilder(apiExplorer, options, Array.Empty<string>(), assembly).GetClientCollection();
+            var clients = new ClientModelBuilder(apiExplorer, options, assembly).GetClientCollection();
 
             // Assert
             Assert.That(clients.Select(c => c.Name), Is.EquivalentTo(new[] { "IFilterNameTypeApi", "ISomeType1Api" }));
@@ -80,7 +79,7 @@ namespace GenerateAspNetCoreClient.Tests
             var apiExplorer = ApiDescriptionTestData.CreateApiExplorer(apiDescriptions);
 
             // Act
-            var clients = new ClientModelBuilder(apiExplorer, options, Array.Empty<string>(), assembly).GetClientCollection();
+            var clients = new ClientModelBuilder(apiExplorer, options, assembly).GetClientCollection();
 
             // Assert
             Assert.That(clients.SelectMany(c => c.EndpointMethods).Select(e => e.Path),
@@ -106,7 +105,7 @@ namespace GenerateAspNetCoreClient.Tests
             var apiExplorer = ApiDescriptionTestData.CreateApiExplorer(apiDescriptions);
 
             // Act
-            var clients = new ClientModelBuilder(apiExplorer, options, Array.Empty<string>(), assembly).GetClientCollection();
+            var clients = new ClientModelBuilder(apiExplorer, options, assembly).GetClientCollection();
 
             // Assert
             Assert.That(clients.SelectMany(c => c.EndpointMethods).Select(e => e.Path),

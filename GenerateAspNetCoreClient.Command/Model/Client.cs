@@ -8,8 +8,6 @@ namespace GenerateAspNetCoreClient.Command.Model
         /// Relative location from target folder.
         /// </summary>
         public string Location { get; }
-
-        public IReadOnlyList<string> ImportedNamespaces { get; }
         public string Namespace { get; }
         public string AccessModifier { get; }
         public string Name { get; }
@@ -17,18 +15,15 @@ namespace GenerateAspNetCoreClient.Command.Model
 
         public Client(
             string location,
-            IReadOnlyList<string> importedNamespaces,
             string @namespace, string accessModifier,
             string name,
             IReadOnlyList<EndpointMethod> endpointMethods)
         {
             Location = location;
-            ImportedNamespaces = importedNamespaces;
             Namespace = @namespace;
             AccessModifier = accessModifier;
             Name = name;
             EndpointMethods = endpointMethods;
         }
-
     }
 }

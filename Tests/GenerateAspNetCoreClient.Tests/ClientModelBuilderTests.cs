@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using GenerateAspNetCoreClient.Command;
 using GenerateAspNetCoreClient.Command.Model;
@@ -18,15 +17,13 @@ namespace GenerateAspNetCoreClient.Tests
             var existingParameter = ApiDescriptionTestData.CreateParameter();
             var apiExplorer = ApiDescriptionTestData.CreateApiExplorer(apiParameters: new[] { existingParameter });
             var assembly = GetType().Assembly;
-            var builder = new ClientModelBuilder(apiExplorer, options, Array.Empty<string>(), assembly);
+            var builder = new ClientModelBuilder(apiExplorer, options, assembly);
 
             // Act
-            var client = builder.GetClientCollection().Clients[0];
+            var client = builder.GetClientCollection()[0];
             var parameters = client.EndpointMethods[0].Parameters;
 
             // Assert
-            Assert.That(client.ImportedNamespaces, Does.Contain("System.Threading"));
-
             Assert.That(parameters.Count, Is.EqualTo(2), "(existing and cancellationToken)");
 
             var cancellationTokenParameter = parameters.Last();

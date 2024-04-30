@@ -39,9 +39,12 @@ namespace Test.Name.Space
         [Post("/WeatherForecast/form")]
         Task WithFormParam([Body(BodySerializationMethod.UrlEncoded)] SomeQueryModel formParam = null);
 
+        [Post("/WeatherForecast/form-collection")]
+        Task WithFormCollectionParam([Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, string> formParam, string queryParam = null);
+
         [Multipart]
         [Post("/WeatherForecast/form-with-file")]
-        Task WithFormWithFileParam(MultipartItem formParam = null, string title = null);
+        Task WithFormWithFileParam(string queryParam = null, MultipartItem formParam = null, string title = null);
 
         [Get("/WeatherForecast/record")]
         Task<RecordModel> WithRecordModels(Guid? id = null, string name = null);

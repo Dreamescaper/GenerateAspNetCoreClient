@@ -22,31 +22,25 @@ namespace GenerateAspNetCoreClient.Command
     {
         private readonly ApiDescriptionGroupCollection apiExplorer;
         private readonly GenerateClientOptions options;
-        private readonly string[] additionalNamespaces;
         private readonly Assembly webProjectAssembly;
 
         public ClientModelBuilder(
             ApiDescriptionGroupCollection apiExplorer,
             GenerateClientOptions options,
-            string[] additionalNamespaces,
             Assembly webProjectAssembly)
         {
             this.apiExplorer = apiExplorer;
             this.options = options;
-            this.additionalNamespaces = additionalNamespaces;
             this.webProjectAssembly = webProjectAssembly;
         }
 
-        public ClientCollection GetClientCollection()
+        public List<Client> GetClientCollection()
         {
             var apiDescriptions = apiExplorer.Items
                 .SelectMany(i => i.Items)
                 .ToList();
 
             FilterDescriptions(apiDescriptions);
-
-            var allNamespaces = GetNamespaces(apiDescriptions);
-            var ambiguousTypes = GetAmbiguousTypes(allNamespaces);
 
             var assemblyName = webProjectAssembly.GetName().Name;
             var apiGroupsDescriptions = apiDescriptions.GroupBy(i => GroupInfo.From(i, assemblyName));
@@ -56,13 +50,11 @@ namespace GenerateAspNetCoreClient.Command
             var clients = apiGroupsDescriptions.Select(apis =>
                 GetClientModel(
                     commonControllerNamespace: commonControllerNamespacePart,
-                    additionalNamespaces: additionalNamespaces,
                     controllerInfo: apis.Key,
-                    apiDescriptions: apis.ToList(),
-                    ambiguousTypes: ambiguousTypes)
+                    apiDescriptions: apis.ToList())
                 ).ToList();
 
-            return new ClientCollection(clients, ambiguousTypes);
+            return clients;
         }
 
         private void FilterDescriptions(List<ApiDescription> apiDescriptions)
@@ -92,10 +84,8 @@ namespace GenerateAspNetCoreClient.Command
 
         internal Client GetClientModel(
             string commonControllerNamespace,
-            string[] additionalNamespaces,
             GroupInfo controllerInfo,
-            List<ApiDescription> apiDescriptions,
-            HashSet<Type> ambiguousTypes)
+            List<ApiDescription> apiDescriptions)
         {
             apiDescriptions = HandleDuplicates(apiDescriptions);
 
@@ -108,22 +98,11 @@ namespace GenerateAspNetCoreClient.Command
 
             var clientNamespace = string.Join(".", new[] { options.Namespace }.Concat(subPath));
 
-            var namespaces = GetNamespaces(apiDescriptions, ambiguousTypes)
-                .Concat(additionalNamespaces);
-
-            if (options.AddCancellationTokenParameters)
-                namespaces = namespaces.Append("System.Threading");
-
-            namespaces = namespaces
-                .OrderByDescending(ns => ns.StartsWith("System"))
-                .ThenBy(ns => ns);
-
             var methods = apiDescriptions.Select(GetEndpointMethod).ToList();
 
             return new Client
             (
                 location: Path.Combine(subPath),
-                importedNamespaces: namespaces.ToList(),
                 @namespace: clientNamespace,
                 accessModifier: options.AccessModifier,
                 name: name,
@@ -182,7 +161,7 @@ namespace GenerateAspNetCoreClient.Command
 
                     parametersList.Add(new Parameter(
                         source: ParameterSource.File,
-                        type: typeof(IFormFile),
+                        type: typeof(Stream),
                         name: parameterDescription.Name,
                         parameterName: name.ToCamelCase(),
                         defaultValueLiteral: null));
@@ -205,23 +184,38 @@ namespace GenerateAspNetCoreClient.Command
                     var name = parameterDescription.ParameterDescriptor?.Name ?? "form";
                     var formType = parameterDescription.ParameterDescriptor?.ParameterType ?? typeof(object);
 
-                    var sameFormParameters = apiDescription.ParameterDescriptions.Skip(i - 1)
-                        .TakeWhile(d => d.ParameterDescriptor?.ParameterType == formType && d.ParameterDescriptor?.Name == name)
-                        .ToArray();
-
-                    // If form model has file parameters - we have to put it as separate parameters.
-                    if (!sameFormParameters.Any(p => p.Source.Id == "FormFile"))
+                    if (formType == typeof(IFormCollection))
                     {
                         parametersList.Add(new Parameter(
                             source: ParameterSource.Form,
-                            type: formType,
+                            type: typeof(Dictionary<string, string>),
                             name: parameterDescription.Name,
                             parameterName: name.ToCamelCase(),
-                            defaultValueLiteral: "null"));
-
-                        i += sameFormParameters.Length - 1;
+                            defaultValueLiteral: null));
 
                         continue;
+                    }
+                    else
+                    {
+                        var sameFormParameters = apiDescription.ParameterDescriptions.Skip(i - 1)
+                            .TakeWhile(d => d.ParameterDescriptor?.ParameterType == formType && d.ParameterDescriptor?.Name == name)
+                            .ToArray();
+
+                        // If form model has file parameters - we have to put it as separate parameters.
+                        if (!sameFormParameters.Any(p => p.Source.Id == "FormFile"))
+                        {
+                            parametersList.Add(new Parameter(
+                                source: ParameterSource.Form,
+                                type: formType,
+                                name: parameterDescription.Name,
+                                parameterName: name.ToCamelCase(),
+                                defaultValueLiteral: "null"));
+
+                            if (sameFormParameters.Length > 0)
+                                i += sameFormParameters.Length - 1;
+
+                            continue;
+                        }
                     }
                 }
 
@@ -282,7 +276,9 @@ namespace GenerateAspNetCoreClient.Command
 
                 parameterName = new string(parameterName.Where(c => char.IsLetterOrDigit(c)).ToArray());
 
-                var type = parameterDescription.ModelMetadata?.ModelType ?? parameterDescription.Type ?? typeof(string);
+                var type = parameterDescription.Source == BindingSource.FormFile
+                    ? typeof(Stream)
+                    : parameterDescription.ModelMetadata?.ModelType ?? parameterDescription.Type ?? typeof(string);
 
                 var defaultValue = GetDefaultValueLiteral(parameterDescription, type);
 
@@ -311,30 +307,6 @@ namespace GenerateAspNetCoreClient.Command
             }
 
             return parametersList;
-        }
-
-        private static HashSet<Type> GetAmbiguousTypes(IEnumerable<string> namespaces)
-        {
-            var namespacesSet = namespaces.ToHashSet();
-
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic)
-                .SelectMany(a =>
-                {
-                    try
-                    {
-                        return a.ExportedTypes;
-                    }
-                    catch
-                    {
-                        return Array.Empty<Type>();
-                    }
-                })
-                .Where(t => t.DeclaringType == null && namespacesSet.Contains(t.Namespace!))
-                .GroupBy(t => t.Name)
-                .Where(g => g.Select(t => t.Namespace).Distinct().Count() > 1)
-                .SelectMany(g => g)
-                .ToHashSet();
         }
 
         private static string? GetXmlDoc(ApiDescription apiDescription)
@@ -383,59 +355,6 @@ namespace GenerateAspNetCoreClient.Command
                 .Select(c => c.Namespace ?? "");
 
             return namespaces.GetCommonPart(".");
-        }
-
-        private List<string> GetNamespaces(IEnumerable<ApiDescription> apiDescriptions, HashSet<Type>? ambiguousTypes = null)
-        {
-            var namespaces = new HashSet<string>();
-
-            foreach (var apiDescription in apiDescriptions)
-            {
-                var responseType = GetResponseType(apiDescription);
-                AddForType(responseType);
-
-                foreach (var parameterDescription in apiDescription.ParameterDescriptions)
-                {
-                    switch (parameterDescription.Source.Id)
-                    {
-                        case "FormFile":
-                            // Skip FormFile, as it won't be present in result file 
-                            // (not needed for 3.1+)
-                            break;
-                        case "Form":
-                            var hasFile = apiDescription.ParameterDescriptions
-                                .Any(d => d.ParameterDescriptor == parameterDescription.ParameterDescriptor && d.Source.Id == "FormFile");
-
-                            if (!hasFile)
-                                AddForType(parameterDescription.ParameterDescriptor.ParameterType);
-
-                            break;
-                        case "Query" when options.UseQueryModels && parameterDescription.ModelMetadata?.ContainerType != null:
-                            AddForType(parameterDescription.ModelMetadata.ContainerType);
-                            break;
-                        default:
-                            AddForType(parameterDescription.ModelMetadata?.ModelType ?? parameterDescription.Type);
-                            break;
-                    }
-                }
-            }
-
-            return namespaces.ToList();
-
-            void AddForType(Type? type)
-            {
-                if (type != null && !type.IsBuiltInType() && ambiguousTypes?.Contains(type) != true)
-                {
-                    if (type.Namespace != null)
-                        namespaces.Add(type.Namespace);
-
-                    if (type.IsGenericType)
-                    {
-                        foreach (var typeArg in type.GetGenericArguments())
-                            AddForType(typeArg);
-                    }
-                }
-            }
         }
 
         private static string? GetDefaultValueLiteral(ApiParameterDescription parameter, Type parameterType)

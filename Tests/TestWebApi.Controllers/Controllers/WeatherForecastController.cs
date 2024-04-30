@@ -95,8 +95,15 @@ public class WeatherForecastController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("form-collection")]
+    public async Task<ActionResult> WithFormCollectionParam([FromQuery] string queryParam, [FromForm] IFormCollection formParam)
+    {
+        await Task.Delay(1);
+        return Ok();
+    }
+
     [HttpPost("form-with-file")]
-    public async Task<ActionResult> WithFormWithFileParam([FromForm] FormModelWithFile formParam)
+    public async Task<ActionResult> WithFormWithFileParam([FromQuery] string queryParam, [FromForm] FormModelWithFile formParam)
     {
         await Task.Delay(1);
         return Ok();
