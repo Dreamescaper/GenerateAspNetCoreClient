@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('net8.0'))" >
+    <BaseIntermediateOutputPath>obj\net8.0</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>obj\net8.0</MSBuildProjectExtensionsPath>
+	<DefaultItemExcludes>$(DefaultItemExcludes);obj\net9.0\**</DefaultItemExcludes>  
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('net9.0'))" >
+    <BaseIntermediateOutputPath>obj\net9.0</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>obj\net9.0</MSBuildProjectExtensionsPath>
+	<DefaultItemExcludes>$(DefaultItemExcludes);obj\net8.0\**</DefaultItemExcludes>  
+  </PropertyGroup>
+</Project>

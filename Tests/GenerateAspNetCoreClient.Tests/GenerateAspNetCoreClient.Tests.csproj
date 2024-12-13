@@ -23,8 +23,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\GenerateAspNetCoreClient\GenerateAspNetCoreClient.csproj" />
-    <ProjectReference Include="..\TestWebApi.Controllers\TestWebApi.Controllers.csproj" />
-    <ProjectReference Include="..\TestWebApi.MinimalApi\TestWebApi.MinimalApi.csproj" />
+    <ProjectReference Include="..\TestWebApi.Controllers\TestWebApi.Controllers.net8.0.csproj" />
+    <ProjectReference Include="..\TestWebApi.MinimalApi\TestWebApi.MinimalApi.net8.0.csproj" />
   </ItemGroup>
 
 </Project>

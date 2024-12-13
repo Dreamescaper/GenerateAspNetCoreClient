@@ -43,6 +43,8 @@ namespace GenerateAspNetCoreClient.Options
         [Option("include-paths", Required = false, HelpText = "Include only endpoints with substring in relative path.")]
         public string? IncludePaths { get; set; }
 
+        public string? BuildExtensionsDir { get; set; }
+
         public string[] AdditionalNamespaces { get; set; } = [];
     }
 }

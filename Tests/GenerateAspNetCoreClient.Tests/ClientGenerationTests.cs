@@ -10,9 +10,9 @@ namespace GenerateAspNetCoreClient.Tests
     [NonParallelizable]
     public class ClientGenerationTests
     {
-        private static readonly string _snapshotsPath = Path.Combine("..", "..", "..", "__snapshots__", "{0}");
+        private static readonly string _snapshotsPath = Path.Combine("..", "..", "..", "__snapshots__", "{0}", "{1}");
 
-        private static readonly string _inputPath = Path.Combine("..", "..", "..", "..", "{0}", "{0}.csproj");
+        private static readonly string _inputPath = Path.Combine("..", "..", "..", "..", "{0}", "{0}.{1}.csproj");
         private static readonly string _outPath = Path.Combine("..", "..", "..", "..", "OutputTest", "Client");
         private static readonly string _outProjectPath = Path.Combine("..", "..", "..", "..", "OutputTest", "OutputProject.csproj");
 
@@ -21,48 +21,58 @@ namespace GenerateAspNetCoreClient.Tests
         [TearDown]
         public void CleanOutput()
         {
-            Directory.Delete(_outPath, true);
+            if (Directory.Exists(_outPath))
+            {
+                Directory.Delete(_outPath, true);
+            }
         }
 
-        [TestCase("TestWebApi.Controllers")]
-        [TestCase("TestWebApi.Versioning")]
-        [TestCase("TestWebApi.MinimalApi")]
-        public void GenerationTest(string testProjectName)
+        [TestCase("TestWebApi.Controllers", "net8.0")]
+        [TestCase("TestWebApi.Controllers", "net9.0")]
+        [TestCase("TestWebApi.Versioning", "net8.0")]
+        [TestCase("TestWebApi.Versioning", "net9.0")]
+        [TestCase("TestWebApi.MinimalApi", "net8.0")]
+        [TestCase("TestWebApi.MinimalApi", "net9.0")]
+        public void GenerationTest(string testProjectName, string framework)
         {
+            var path = string.Format(_inputPath, testProjectName, framework);
             var options = new GenerateClientOptions
             {
-                InputPath = string.Format(_inputPath, testProjectName),
+                InputPath = path,
                 OutPath = _outPath,
                 Namespace = "Test.Name.Space",
+                BuildExtensionsDir = Path.Combine(Path.GetDirectoryName(path), "obj", framework)
             };
 
             Program.CreateClient(options);
 
             Assert.That(() => Project.FromPath(_outProjectPath).Build(), Throws.Nothing);
-            AssertSnapshotMatch(testProjectName);
+            AssertSnapshotMatch(testProjectName, framework);
         }
 
-
-        [Test]
-        public void GenerationTest_UseApiResponses()
+        [TestCase("net8.0")]
+        [TestCase("net9.0")]
+        public void GenerationTest_UseApiResponses(string framework)
         {
+            var path = string.Format(_inputPath, "TestWebApi.Controllers.UseApiResponses", framework);
             var options = new GenerateClientOptions
             {
-                InputPath = string.Format(_inputPath, "TestWebApi.Controllers.UseApiResponses"),
+                InputPath = path,
                 UseApiResponses = true,
                 OutPath = _outPath,
                 Namespace = "Test.Name.Space",
+                BuildExtensionsDir = Path.Combine(Path.GetDirectoryName(path), "obj", framework)
             };
 
             Program.CreateClient(options);
 
             Assert.That(() => Project.FromPath(_outProjectPath).Build(), Throws.Nothing);
-            AssertSnapshotMatch("TestWebApi.Controllers.UseApiResponses");
+            AssertSnapshotMatch("TestWebApi.Controllers.UseApiResponses", framework);
         }
 
-        private static void RegenerateSnapshots(string testProjectName)
+        private static void RegenerateSnapshots(string testProjectName, string framework)
         {
-            var snapshotsPath = string.Format(_snapshotsPath, testProjectName);
+            var snapshotsPath = string.Format(_snapshotsPath, testProjectName, framework);
 
             if (Directory.Exists(snapshotsPath))
             {
@@ -82,14 +92,14 @@ namespace GenerateAspNetCoreClient.Tests
             throw new Exception("Don't forget to disable snapshot regeneration.");
         }
 
-        private static void AssertSnapshotMatch(string testProjectName)
+        private static void AssertSnapshotMatch(string testProjectName, string framework)
         {
             if (_regenerateSnapshots)
             {
-                RegenerateSnapshots(testProjectName);
+                RegenerateSnapshots(testProjectName, framework);
             }
 
-            var snapshotsPath = string.Format(_snapshotsPath, testProjectName);
+            var snapshotsPath = string.Format(_snapshotsPath, testProjectName, framework);
             var generatedFiles = Directory.EnumerateFiles(_outPath, "*", new EnumerationOptions { RecurseSubdirectories = true });
 
             foreach (var generatedFile in generatedFiles)

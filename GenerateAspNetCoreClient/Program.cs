@@ -20,7 +20,7 @@ namespace GenerateAspNetCoreClient
 
         internal static void CreateClient(GenerateClientOptions options)
         {
-            var assemblyPath = GetAssemblyPath(options.InputPath);
+            var assemblyPath = GetAssemblyPath(options.InputPath, options.BuildExtensionsDir);
             var directory = Path.GetDirectoryName(assemblyPath);
 
             var sharedOptionsAssembly = typeof(GenerateClientOptions).Assembly;
@@ -36,7 +36,7 @@ namespace GenerateAspNetCoreClient
                 .Invoke(null, new object[] { webProjectAssembly, options });
         }
 
-        private static string GetAssemblyPath(string path)
+        private static string GetAssemblyPath(string path, string buildExtensionsDir)
         {
             if (Path.GetExtension(path).Equals(".dll", StringComparison.OrdinalIgnoreCase))
             {
@@ -46,7 +46,7 @@ namespace GenerateAspNetCoreClient
             else
             {
                 // Otherwise - publish the project and return built .dll
-                var project = Project.FromPath(path);
+                var project = Project.FromPath(path, buildExtensionsDir);
                 project.Build();
                 return project.OutputFilePath;
             }
