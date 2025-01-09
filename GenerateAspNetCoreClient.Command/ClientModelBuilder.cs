@@ -150,12 +150,13 @@ namespace GenerateAspNetCoreClient.Command
             for (int i = 0; i < apiDescription.ParameterDescriptions.Count; i++)
             {
                 var parameterDescription = apiDescription.ParameterDescriptions[i];
+                var paramType = parameterDescription.ParameterDescriptor?.ParameterType;
 
-                if (parameterDescription.ParameterDescriptor?.ParameterType == typeof(CancellationToken))
+                if (paramType == typeof(CancellationToken))
                     continue;
 
                 // IFormFile
-                if (parameterDescription.ParameterDescriptor?.ParameterType == typeof(IFormFile))
+                if (paramType == typeof(IFormFile))
                 {
                     var name = parameterDescription.ParameterDescriptor.Name;
 
@@ -168,8 +169,8 @@ namespace GenerateAspNetCoreClient.Command
 
                     // Skip parameters that correspond to same file
                     while (i + 1 < apiDescription.ParameterDescriptions.Count
-                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.ParameterType == typeof(IFormFile)
-                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
+                           && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.ParameterType == typeof(IFormFile)
+                           && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
                     {
                         i++;
                     }
@@ -177,12 +178,36 @@ namespace GenerateAspNetCoreClient.Command
                     continue;
                 }
 
+                // IFormFile[], List<IFormFile>
+                if (paramType != null)
+                {
+                    bool isFormFileArray = paramType == typeof(IFormFile[]);
+                    bool isFormFileList =
+                        paramType.IsGenericType
+                        && paramType.GetGenericTypeDefinition() == typeof(List<>)
+                        && paramType.GetGenericArguments()[0] == typeof(IFormFile);
+
+                    if (isFormFileArray || isFormFileList)
+                    {
+                        var name = parameterDescription.ParameterDescriptor?.Name;
+
+                        parametersList.Add(new Parameter(
+                            source: ParameterSource.File,
+                            type: typeof(List<Stream>),
+                            name: parameterDescription.Name,
+                            parameterName: name.ToCamelCase(),
+                            defaultValueLiteral: "null"));
+
+                        continue;
+                    }
+                }
+
                 // Form
                 // API explorer shows form as separate parameters. We want to have single model parameter.
                 if (parameterDescription.Source == BindingSource.Form)
                 {
                     var name = parameterDescription.ParameterDescriptor?.Name ?? "form";
-                    var formType = parameterDescription.ParameterDescriptor?.ParameterType ?? typeof(object);
+                    var formType = paramType ?? typeof(object);
 
                     if (formType == typeof(IFormCollection))
                     {
@@ -236,8 +261,8 @@ namespace GenerateAspNetCoreClient.Command
 
                     // Skip parameters that correspond to same query model
                     while (i + 1 < apiDescription.ParameterDescriptions.Count
-                        && apiDescription.ParameterDescriptions[i + 1].ModelMetadata?.ContainerType == containerType
-                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
+                           && apiDescription.ParameterDescriptions[i + 1].ModelMetadata?.ContainerType == containerType
+                           && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
                     {
                         i++;
                     }
