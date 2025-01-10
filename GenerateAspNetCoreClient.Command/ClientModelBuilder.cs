@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -196,7 +197,7 @@ namespace GenerateAspNetCoreClient.Command
                             type: typeof(List<Stream>),
                             name: parameterDescription.Name,
                             parameterName: name.ToCamelCase(),
-                            defaultValueLiteral: "null"));
+                            defaultValueLiteral: null));
 
                         continue;
                     }
@@ -302,7 +303,12 @@ namespace GenerateAspNetCoreClient.Command
                 parameterName = new string(parameterName.Where(c => char.IsLetterOrDigit(c)).ToArray());
 
                 var type = parameterDescription.Source == BindingSource.FormFile
-                    ? typeof(Stream)
+                    ? parameterDescription.Type == typeof(IFormFile[]) ||
+                      (parameterDescription.Type.IsGenericType &&
+                       parameterDescription.Type.GetGenericTypeDefinition() == typeof(List<>)
+                       && parameterDescription.Type.GetGenericArguments()[0] == typeof(IFormFile))
+                        ? typeof(List<Stream>)
+                        : typeof(Stream)
                     : parameterDescription.ModelMetadata?.ModelType ?? parameterDescription.Type ?? typeof(string);
 
                 var defaultValue = GetDefaultValueLiteral(parameterDescription, type);

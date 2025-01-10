@@ -62,6 +62,12 @@ public class WeatherForecastController : ControllerBase
         return null;
     }
 
+    [HttpPost("upload-multiple")]
+    public Task Upload(List<IFormFile> uploadedFiles)
+    {
+        return null;
+    }
+
     [HttpGet("download")]
     public Task<FileContentResult> Download()
     {
@@ -109,6 +115,13 @@ public class WeatherForecastController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("form-with-files")]
+    public async Task<ActionResult> WithFormWithFilesParam([FromQuery] string queryParam, [FromForm] FormModelWithMultipleFiles formParam)
+    {
+        await Task.Delay(1);
+        return Ok();
+    }
+
     [HttpGet("record")]
     public async Task<ActionResult<RecordModel>> WithRecordModels([FromQuery] RecordModel record)
     {
@@ -119,3 +132,5 @@ public class WeatherForecastController : ControllerBase
 
 
 public record FormModelWithFile(IFormFile File, string Title);
+
+public record FormModelWithMultipleFiles(IFormFile[] Files, string Title);
