@@ -169,8 +169,8 @@ namespace GenerateAspNetCoreClient.Command
 
                     // Skip parameters that correspond to same file
                     while (i + 1 < apiDescription.ParameterDescriptions.Count
-                           && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.ParameterType == typeof(IFormFile)
-                           && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
+                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.ParameterType == typeof(IFormFile)
+                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
                     {
                         i++;
                     }
@@ -261,8 +261,8 @@ namespace GenerateAspNetCoreClient.Command
 
                     // Skip parameters that correspond to same query model
                     while (i + 1 < apiDescription.ParameterDescriptions.Count
-                           && apiDescription.ParameterDescriptions[i + 1].ModelMetadata?.ContainerType == containerType
-                           && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
+                        && apiDescription.ParameterDescriptions[i + 1].ModelMetadata?.ContainerType == containerType
+                        && apiDescription.ParameterDescriptions[i + 1].ParameterDescriptor?.Name == name)
                     {
                         i++;
                     }
