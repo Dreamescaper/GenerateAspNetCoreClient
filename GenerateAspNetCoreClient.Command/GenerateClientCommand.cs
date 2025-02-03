@@ -84,10 +84,8 @@ namespace GenerateAspNetCoreClient.Command
                         string type;
                         if (p.Source == ParameterSource.File)
                         {
-                            type = p.Type.IsArray || (p.Type.IsGenericType &&
-                                                      p.Type.GetGenericTypeDefinition() == typeof(List<>))
-                                ? "List<MultipartItem>"
-                                : "MultipartItem";
+                            bool isEnumerable = p.Type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(p.Type);
+                            type = isEnumerable ? "List<MultipartItem>" : "MultipartItem";
                         }
                         else
                         {
