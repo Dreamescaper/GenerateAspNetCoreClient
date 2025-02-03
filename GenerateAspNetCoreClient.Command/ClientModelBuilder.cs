@@ -178,16 +178,10 @@ namespace GenerateAspNetCoreClient.Command
                     continue;
                 }
 
-                // IFormFile[], List<IFormFile>
+                // IEnumerable<IFormFile>
                 if (paramType != null)
                 {
-                    bool isFormFileArray = paramType == typeof(IFormFile[]);
-                    bool isFormFileList =
-                        paramType.IsGenericType
-                        && paramType.GetGenericTypeDefinition() == typeof(List<>)
-                        && paramType.GetGenericArguments()[0] == typeof(IFormFile);
-
-                    if (isFormFileArray || isFormFileList)
+                    if (typeof(IEnumerable<IFormFile>).IsAssignableFrom(paramType))
                     {
                         var name = parameterDescription.ParameterDescriptor?.Name;
 
@@ -195,7 +189,7 @@ namespace GenerateAspNetCoreClient.Command
                             source: ParameterSource.File,
                             type: typeof(List<Stream>),
                             name: parameterDescription.Name,
-                            parameterName: name.ToCamelCase(),
+                            parameterName: name?.ToCamelCase() ?? "files",
                             defaultValueLiteral: null));
 
                         continue;
@@ -227,7 +221,7 @@ namespace GenerateAspNetCoreClient.Command
                             .ToArray();
 
                         // If form model has file parameters - we have to put it as separate parameters.
-                        if (!sameFormParameters.Any(p => p.Source.Id == "FormFile"))
+                        if (sameFormParameters.All(p => p.Source.Id != "FormFile"))
                         {
                             parametersList.Add(new Parameter(
                                 source: ParameterSource.Form,
@@ -299,16 +293,19 @@ namespace GenerateAspNetCoreClient.Command
                     ? parameterDescription.Name.ToCamelCase()
                     : (parameterDescription.ParameterDescriptor?.Name ?? parameterDescription.Name).ToCamelCase();
 
-                parameterName = new string(parameterName.Where(c => char.IsLetterOrDigit(c)).ToArray());
+                parameterName = new string(parameterName.Where(char.IsLetterOrDigit).ToArray());
 
-                var type = parameterDescription.Source == BindingSource.FormFile
-                    ? parameterDescription.Type == typeof(IFormFile[]) ||
-                      (parameterDescription.Type.IsGenericType &&
-                       parameterDescription.Type.GetGenericTypeDefinition() == typeof(List<>)
-                       && parameterDescription.Type.GetGenericArguments()[0] == typeof(IFormFile))
+                Type type;
+                if (parameterDescription.Source == BindingSource.FormFile)
+                {
+                    type = typeof(IEnumerable<IFormFile>).IsAssignableFrom(parameterDescription.Type)
                         ? typeof(List<Stream>)
-                        : typeof(Stream)
-                    : parameterDescription.ModelMetadata?.ModelType ?? parameterDescription.Type ?? typeof(string);
+                        : typeof(Stream);
+                }
+                else
+                {
+                    type = parameterDescription.ModelMetadata?.ModelType ?? parameterDescription.Type;
+                }
 
                 var defaultValue = GetDefaultValueLiteral(parameterDescription, type);
 
