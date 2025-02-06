@@ -81,7 +81,17 @@ namespace GenerateAspNetCoreClient.Command
                             _ => ""
                         };
 
-                        var type = p.Source == ParameterSource.File ? "MultipartItem" : p.Type.GetName(ambiguousTypes);
+                        string type;
+                        if (p.Source == ParameterSource.File)
+                        {
+                            bool isEnumerable = p.Type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(p.Type);
+                            type = isEnumerable ? "List<MultipartItem>" : "MultipartItem";
+                        }
+                        else
+                        {
+                            type = p.Type.GetName(ambiguousTypes);
+                        }
+
                         var defaultValue = p.DefaultValueLiteral == null ? "" : " = " + p.DefaultValueLiteral;
                         return $"{attribute}{type} {p.ParameterName}{defaultValue}";
                     })

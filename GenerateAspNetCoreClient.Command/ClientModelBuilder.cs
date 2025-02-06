@@ -150,12 +150,13 @@ namespace GenerateAspNetCoreClient.Command
             for (int i = 0; i < apiDescription.ParameterDescriptions.Count; i++)
             {
                 var parameterDescription = apiDescription.ParameterDescriptions[i];
+                var paramType = parameterDescription.ParameterDescriptor?.ParameterType;
 
-                if (parameterDescription.ParameterDescriptor?.ParameterType == typeof(CancellationToken))
+                if (paramType == typeof(CancellationToken))
                     continue;
 
                 // IFormFile
-                if (parameterDescription.ParameterDescriptor?.ParameterType == typeof(IFormFile))
+                if (paramType == typeof(IFormFile))
                 {
                     var name = parameterDescription.ParameterDescriptor.Name;
 
@@ -177,12 +178,30 @@ namespace GenerateAspNetCoreClient.Command
                     continue;
                 }
 
+                // IEnumerable<IFormFile>
+                if (paramType != null)
+                {
+                    if (typeof(IEnumerable<IFormFile>).IsAssignableFrom(paramType))
+                    {
+                        var name = parameterDescription.ParameterDescriptor?.Name;
+
+                        parametersList.Add(new Parameter(
+                            source: ParameterSource.File,
+                            type: typeof(List<Stream>),
+                            name: parameterDescription.Name,
+                            parameterName: name?.ToCamelCase() ?? "files",
+                            defaultValueLiteral: null));
+
+                        continue;
+                    }
+                }
+
                 // Form
                 // API explorer shows form as separate parameters. We want to have single model parameter.
                 if (parameterDescription.Source == BindingSource.Form)
                 {
                     var name = parameterDescription.ParameterDescriptor?.Name ?? "form";
-                    var formType = parameterDescription.ParameterDescriptor?.ParameterType ?? typeof(object);
+                    var formType = paramType ?? typeof(object);
 
                     if (formType == typeof(IFormCollection))
                     {
@@ -202,7 +221,7 @@ namespace GenerateAspNetCoreClient.Command
                             .ToArray();
 
                         // If form model has file parameters - we have to put it as separate parameters.
-                        if (!sameFormParameters.Any(p => p.Source.Id == "FormFile"))
+                        if (sameFormParameters.All(p => p.Source.Id != "FormFile"))
                         {
                             parametersList.Add(new Parameter(
                                 source: ParameterSource.Form,
@@ -274,11 +293,19 @@ namespace GenerateAspNetCoreClient.Command
                     ? parameterDescription.Name.ToCamelCase()
                     : (parameterDescription.ParameterDescriptor?.Name ?? parameterDescription.Name).ToCamelCase();
 
-                parameterName = new string(parameterName.Where(c => char.IsLetterOrDigit(c)).ToArray());
+                parameterName = new string(parameterName.Where(char.IsLetterOrDigit).ToArray());
 
-                var type = parameterDescription.Source == BindingSource.FormFile
-                    ? typeof(Stream)
-                    : parameterDescription.ModelMetadata?.ModelType ?? parameterDescription.Type ?? typeof(string);
+                Type type;
+                if (parameterDescription.Source == BindingSource.FormFile)
+                {
+                    type = typeof(IEnumerable<IFormFile>).IsAssignableFrom(parameterDescription.Type)
+                        ? typeof(List<Stream>)
+                        : typeof(Stream);
+                }
+                else
+                {
+                    type = parameterDescription.ModelMetadata?.ModelType ?? parameterDescription.Type;
+                }
 
                 var defaultValue = GetDefaultValueLiteral(parameterDescription, type);
 
