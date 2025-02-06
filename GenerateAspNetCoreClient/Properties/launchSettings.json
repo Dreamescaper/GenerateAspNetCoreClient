@@ -2,7 +2,7 @@
   "profiles": {
     "GenerateAspNetCoreClient": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\src\\csv.io\\src\\UserHQ.Api\\UserHQ.Api.csproj\" -o \"D:\\src\\csv.io\\src\\UserHQ.Api.Client\" --namespace UserHQ.Api.Client --add-cancellation-token true --use-api-responses true --exclude-types"
+      "commandLineArgs": "\"..\\..\\..\\..\\Tests\\TestWebApi.Controllers\\TestWebApi.Controllers.csproj\" -o \"..\\..\\..\\..\\Tests\\OutputTest\" -n \"TestClient\""
     }
   }
 }
