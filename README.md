@@ -1,5 +1,5 @@
-
 [![Nuget](https://img.shields.io/nuget/v/GenerateAspNetCoreClient.Refit)](https://www.nuget.org/packages/GenerateAspNetCoreClient.Refit/)
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
 
 # GenerateAspNetCoreClient
 DotNet tool to generate [Refit](https://github.com/reactiveui/refit) HTTP client types from ASP.NET Core API controllers.
