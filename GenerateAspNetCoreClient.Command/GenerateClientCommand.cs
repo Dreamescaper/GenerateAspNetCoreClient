@@ -126,9 +126,6 @@ namespace {clientModel.Namespace}
             var namespaces = GetNamespaces(clientModel.EndpointMethods, ambiguousTypes)
                 .Concat(options.AdditionalNamespaces);
 
-            if (options.AddCancellationTokenParameters)
-                namespaces = namespaces.Append("System.Threading");
-
             namespaces = namespaces
                 .OrderByDescending(ns => ns.StartsWith("System"))
                 .ThenBy(ns => ns);
