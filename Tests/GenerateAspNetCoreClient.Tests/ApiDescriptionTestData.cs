@@ -47,7 +47,7 @@ namespace GenerateAspNetCoreClient.Tests
                     ControllerName = controllerType.Name.Replace("Controller", ""),
                     ControllerTypeInfo = controllerType.GetTypeInfo(),
                     DisplayName = $"{controllerType.FullName}.{actionName} ({controllerType.Assembly.GetName().Name})",
-                    MethodInfo = typeof(WeatherForecastController).GetMethod("Get", Array.Empty<Type>())
+                    MethodInfo = typeof(WeatherForecastController).GetMethod("Get", [])
                 },
                 HttpMethod = httpMethod,
                 RelativePath = path,
@@ -61,7 +61,7 @@ namespace GenerateAspNetCoreClient.Tests
                 }
             };
 
-            foreach (var parDescription in apiParameters ?? new[] { CreateParameter() })
+            foreach (var parDescription in apiParameters ?? [CreateParameter()])
             {
                 apiDescription.ParameterDescriptions.Add(parDescription);
             }
@@ -85,7 +85,7 @@ namespace GenerateAspNetCoreClient.Tests
             Type responseType = null)
         {
             var apiDescription = CreateApiDescription(httpMethod, actionName, path, apiParameters, responseType);
-            return CreateApiExplorer(new[] { apiDescription });
+            return CreateApiExplorer([apiDescription]);
         }
     }
 }

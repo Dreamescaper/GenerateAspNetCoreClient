@@ -108,7 +108,7 @@ namespace GenerateAspNetCoreClient.Command
                 return null;
             }
 
-            return args => (T)factory!.Invoke(null, new object[] { args })!;
+            return args => (T)factory!.Invoke(null, [args])!;
         }
 
         // TReturn Factory(string[] args);
@@ -167,7 +167,7 @@ namespace GenerateAspNetCoreClient.Command
 
                     args = args.Any(arg => IsApplicationNameArg(arg)) || assembly.FullName is null
                         ? args
-                        : args.Concat(new[] { "--applicationName", assembly.FullName }).ToArray();
+                        : args.Concat(["--applicationName", assembly.FullName]).ToArray();
 
                     var host = hostFactory(args);
                     return GetServiceProvider(host);
@@ -180,7 +180,7 @@ namespace GenerateAspNetCoreClient.Command
         private static object? Build(object builder)
         {
             var buildMethod = builder.GetType().GetMethod("Build");
-            return buildMethod?.Invoke(builder, Array.Empty<object>());
+            return buildMethod?.Invoke(builder, []);
         }
 
         private static IServiceProvider? GetServiceProvider(object? host)
@@ -236,11 +236,11 @@ namespace GenerateAspNetCoreClient.Command
                         var parameters = _entryPoint.GetParameters();
                         if (parameters.Length == 0)
                         {
-                            _entryPoint.Invoke(null, Array.Empty<object>());
+                            _entryPoint.Invoke(null, []);
                         }
                         else
                         {
-                            _entryPoint.Invoke(null, new object[] { _args });
+                            _entryPoint.Invoke(null, [_args]);
                         }
 
                         // Try to set an exception if the entry point returns gracefully, this will force

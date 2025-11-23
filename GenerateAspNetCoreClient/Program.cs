@@ -33,7 +33,7 @@ namespace GenerateAspNetCoreClient
 
             commandAssembly.GetTypes().First(t => t.Name == "GenerateClientCommand")
                 .GetMethod("Invoke")
-                .Invoke(null, new object[] { webProjectAssembly, options });
+                .Invoke(null, [webProjectAssembly, options]);
         }
 
         private static string GetAssemblyPath(string path)

@@ -345,7 +345,7 @@ namespace GenerateAspNetCoreClient.Command
 
             var xmlLines = xmlElement.Elements()
                 .Select(e => e.ToString())
-                .SelectMany(s => s.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries))
+                .SelectMany(s => s.Split(["\r\n", "\r", "\n"], StringSplitOptions.RemoveEmptyEntries))
                 .Select(line => line.Trim().Replace("cref=\"T:", "cref=\""));
 
             var xmlDoc = string.Join(Environment.NewLine, xmlLines).Indent("/// ");

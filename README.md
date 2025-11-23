@@ -5,7 +5,7 @@
 DotNet tool to generate [Refit](https://github.com/reactiveui/refit) HTTP client types from ASP.NET Core API controllers.
 
 ## Prerequisites
-Tool requires .NET 9 runtime installed, and it supports projects with ASP.NET Core 9 or 8.
+Tool requires .NET 10 runtime installed, and it supports projects with ASP.NET Core 8, 9 or 10.
 
 
 ## Usage

@@ -32,7 +32,7 @@ namespace GenerateAspNetCoreClient.Tests
             var clients = new ClientModelBuilder(apiExplorer, options, assembly).GetClientCollection();
 
             // Assert
-            Assert.That(clients.Select(c => c.Name), Is.EquivalentTo(new[] { "IOtherNameTypeApi", "ISomeType2Api" }));
+            Assert.That(clients.Select(c => c.Name), Is.EquivalentTo(["IOtherNameTypeApi", "ISomeType2Api"]));
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace GenerateAspNetCoreClient.Tests
             var clients = new ClientModelBuilder(apiExplorer, options, assembly).GetClientCollection();
 
             // Assert
-            Assert.That(clients.Select(c => c.Name), Is.EquivalentTo(new[] { "IFilterNameTypeApi", "ISomeType1Api" }));
+            Assert.That(clients.Select(c => c.Name), Is.EquivalentTo(["IFilterNameTypeApi", "ISomeType1Api"]));
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace GenerateAspNetCoreClient.Tests
 
             // Assert
             Assert.That(clients.SelectMany(c => c.EndpointMethods).Select(e => e.Path),
-                Is.EquivalentTo(new[] { "other-path", "other-path-items" }));
+                Is.EquivalentTo(["other-path", "other-path-items"]));
         }
 
         [Test]
@@ -109,7 +109,7 @@ namespace GenerateAspNetCoreClient.Tests
 
             // Assert
             Assert.That(clients.SelectMany(c => c.EndpointMethods).Select(e => e.Path),
-                Is.EquivalentTo(new[] { "filter-path/items", "filter-path-items", }));
+                Is.EquivalentTo(["filter-path/items", "filter-path-items"]));
         }
     }
 

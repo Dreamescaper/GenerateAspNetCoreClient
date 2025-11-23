@@ -48,7 +48,7 @@ namespace GenerateAspNetCoreClient.Command.Extensions
 
         public static string Indent(this string @this, string indent)
         {
-            var lines = @this.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            var lines = @this.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
             var indentedLines = lines.Select(line => line.Length == 0 ? line : indent + line);
             return string.Join(Environment.NewLine, indentedLines);
         }

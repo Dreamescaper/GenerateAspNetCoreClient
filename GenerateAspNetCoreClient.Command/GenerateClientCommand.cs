@@ -291,7 +291,7 @@ namespace {clientModel.Namespace}
                 var setDataMethod = typeof(AppContext).GetMethod("SetData");
 
                 if (setDataMethod != null)
-                    setDataMethod.Invoke(null, new[] { "APP_CONTEXT_BASE_DIRECTORY", path });
+                    setDataMethod.Invoke(null, ["APP_CONTEXT_BASE_DIRECTORY", path]);
             }
         }
     }
